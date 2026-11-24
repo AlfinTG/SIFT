@@ -61,14 +61,19 @@ class Assessment(BaseModel):
     level: Literal["low_indicators", "moderate", "high", "critical"]
     summary: str
     uncertain: bool
+    contributing_sources: list[SignalSource] = Field(default_factory=list)
 
 
 class ModelStatus(BaseModel):
-    status: Literal["unavailable"] = "unavailable"
+    available: bool = False
+    status: Literal["unavailable", "available", "error", "not_run"] = "unavailable"
     label: None = None
-    score: None = None
-    score_name: None = None
+    prediction: Literal["SCAM", "LEGITIMATE"] | None = None
+    score: float | None = Field(default=None, ge=0, le=1)
+    score_name: Literal["model_score_not_calibrated_probability"] | None = None
+    model_version: str | None = None
     limitation: str
+    limitations: list[str] = Field(default_factory=list)
 
 
 class AnalyzeResponse(BaseModel):

@@ -47,7 +47,9 @@ A practical first pilot:
 
 After checking the pilot, consider scaling to a few hundred examples. Do not start with thousands simply because credits are available. First inspect whether the output is varied, correctly labelled, and useful for the intended classifier.
 
-For a larger initial corpus, aim for class balance and coverage across the four target scam families. Include legitimate examples from the same contexts (realistic HR notices, delivery messages, bank safety warnings, payment confirmations, school announcements, ordinary promotions) so the classifier does not learn that a category or keyword alone implies fraud.
+For the controlled pilot, target five equally represented scam families: fake jobs, phishing/KYC, UPI/payment, reward/lottery, and other clear scams. Pair legitimate hard negatives by context: employment/recruitment; banking/OTP/KYC safety; payments/refunds/UPI; delivery/rewards/promotions; and miscellaneous legitimate communications. This prevents the classifier from learning that a category or keyword alone implies fraud.
+
+The SCAM and LEGITIMATE pilot targets are 16 English, 8 Devanagari Hindi, 12 natural Hinglish, and 4 mixed-language examples per class. The separate 16-row AMBIGUOUS target is 6 English, 4 Hindi, 4 Hinglish, and 2 mixed. These are quality-aware planning targets, not grounds to force unnatural text or incorrect labels.
 
 ## 5. Hard negatives and contrast pairs
 

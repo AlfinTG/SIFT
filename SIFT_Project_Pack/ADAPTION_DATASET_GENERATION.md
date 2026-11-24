@@ -10,16 +10,17 @@ Adaption documentation describes Invent as generating model-ready datasets from 
 
 1. Sign in to the Adaption account and confirm the actual available balance, current row limits, and pricing.
 2. Use the Invent a Dataset workflow.
-3. Run a **small pilot** first (for example, 80 rows total or separate smaller batches).
+3. Run the controlled **96-row pilot** first: 40 SCAM, 40 LEGITIMATE hard negatives, and 16 separately generated AMBIGUOUS rows.
 4. Request a credit estimate for the exact prompt and row count before generation. Do not launch a paid run until the displayed estimate and scope are acceptable.
-5. Generate scam examples and legitimate hard negatives. Separate batches are recommended because they give more control over class balance.
+5. Generate SCAM, LEGITIMATE hard-negative, and AMBIGUOUS review rows as separate batches. The AMBIGUOUS batch is never binary training data.
 6. Download the generated dataset as JSONL if available.
 7. Preserve the original download as immutable raw data.
 8. Parse the prompt/completion records into the SIFT training schema described in `DATA_DICTIONARY.md`.
 9. Validate the parsed fields and manually review a sample from each batch.
-10. Deduplicate, check diversity, and inspect labels before using any row for training.
-11. Keep ambiguous examples separate.
-12. Freeze the accepted dataset version and record its provenance.
+10. Deduplicate, check diversity, language targets, template families, and labels before using any row for training.
+11. Keep ambiguous examples separate through conversion, review, and evaluation.
+12. Complete the review ledger with reviewer ID, ISO 8601 review time, decision, and notes for every accepted row.
+13. Freeze the accepted dataset version and record its provenance.
 
 ## 3. Credit discipline
 
@@ -49,19 +50,26 @@ Do not train a text classifier on the entire instruction prompt plus answer. Tha
 
 | Batch | Purpose | Pilot size | Later scale (only if quality passes) |
 |---|---|---:|---:|
-| Scam batch | Fake job, phishing/KYC, UPI/payment, reward/lottery examples | 40 | 200–400 |
-| Legitimate batch | Hard negatives in matching contexts | 40 | 200–400 |
-| Ambiguous challenge batch | Context-poor or mixed-signal messages for review/testing | 10–20 | 30–80 |
+| `sift-pilot-v2-scam` | 8 each: fake job, phishing/KYC, UPI/payment, reward/lottery, other | 40 | 200–400 |
+| `sift-pilot-v2-legitimate` | 8 each: employment; banking/OTP/KYC; payments/refunds/UPI; delivery/rewards/promotions; miscellaneous | 40 | 200–400 |
+| `sift-pilot-v2-ambiguous` | Genuine uncertainty for separate review/challenge use | 16 | 30–80 |
 
-Numbers are planning targets, not Adaption plan limits or guaranteed output counts. Keep the scam and legitimate classes approximately balanced in the accepted training set.
+Numbers are planning targets, not Adaption plan limits or guaranteed output counts. Keep the scam and legitimate classes approximately balanced in the accepted training set. SCAM and LEGITIMATE language targets are 16 English, 8 Devanagari Hindi, 12 natural Hinglish, and 4 mixed-language examples per class. AMBIGUOUS targets are 6, 4, 4, and 2 respectively. Quality, naturalness, and correct labels take priority over quota fulfilment.
+
+For every batch, record the stable `source_batch`, `generation_prompt_version`, generation date, raw export filename, reviewer owner, and family/language targets in batch notes. The current SCAM batch is `sift-pilot-v2-scam-40` with generation prompt version `sift-pilot-v2`; preserve its export as `ml/data/raw/sift-pilot-v2-scam-40.jsonl` without editing it.
 
 ## 6. Prompt files
 
 - `dataset_prompts/adaption_invent_master_prompt.txt` — complete schema and style requirements.
 - `dataset_prompts/adaption_scam_messages_prompt.txt` — use for scam-positive batches; specify one family per run or distribute families evenly.
 - `dataset_prompts/adaption_legitimate_hard_negatives_prompt.txt` — use for realistic benign controls.
+- `dataset_prompts/adaption_ambiguous_messages_prompt.txt` — use only for the separate ambiguity/review batch.
 
 For maximum control, run separate batches by class/family and combine after review. If using a single combined prompt, check the actual class distribution rather than assuming the generator followed an exact quota.
+
+## 6.1 Review and split controls
+
+Run the offline review report across all converted batches together. Treat exact matches, near-duplicate candidates, and manually identified conceptual paraphrases as one template group. Keep each `template_family`, its paraphrases, and any shared seed in a single future split; do not randomly split individual rows. Create the final challenge set independently from pilot generation and do not use it for prompt selection, feature design, thresholds, or model selection.
 
 ## 7. What to look for in the first 20–30 rows
 

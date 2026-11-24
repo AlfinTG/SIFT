@@ -44,9 +44,13 @@ Example request:
 | `assessment.level` | `low_indicators` \| `moderate` \| `high` \| `critical` | Overall risk level. It is not a fraud probability. |
 | `assessment.summary` | string | Risk summary. |
 | `assessment.uncertain` | boolean | Always render the result as uncertain; SIFT does not verify safety. |
-| `model.status` | `unavailable` | Analysis-engine availability for the ML classifier. The current build has no model artifact. |
-| `model.label`, `model.score`, `model.score_name` | null | Always `null` in the rules-only build; do not render these as a prediction. |
-| `model.limitation` | string | Explanation of the unavailable ML engine. |
+| `assessment.contributing_sources` | array | Signal sources that contributed to the overall assessment. |
+| `model.available` | boolean | Whether a local model prediction was produced for this request. |
+| `model.status` | `available` | `unavailable` | `error` | `not_run` | Local ML inference state. |
+| `model.prediction` | `SCAM` | `LEGITIMATE` | null | Prediction only when `available` is true; never fabricated in fallback mode. |
+| `model.score`, `model.score_name` | number/null, fixed descriptor/null | An uncalibrated model score, never a fraud probability. |
+| `model.model_version` | string/null | Local artifact filename when inference succeeds. |
+| `model.limitation`, `model.limitations` | string, array | Scope and failure/fallback explanations. |
 | `signals` | array | Unified evidence trail. Filter by `source`: `rule` for rule-engine findings and `url` for URL-structure findings. |
 | `signals[].evidence` | string | Exact evidence snippet for display. |
 | `signals[].reason` | string | Plain-language explanation. |
@@ -55,7 +59,7 @@ Example request:
 | `limitations` | array of strings | Mandatory scope and safety caveats. |
 | `next_steps` | array of strings | Incident-aware safe actions. |
 
-Rule and URL engines are active in this foundation. Their availability is represented by the returned `signals` and `urls`; the ML engine's availability is explicitly represented by `model.status`.
+Rule and URL engines remain independent. A SCAM ML prediction adds only a medium-severity supporting signal; it cannot create a critical assessment or override explicit deterministic rule evidence. A LEGITIMATE ML prediction does not suppress rule or URL evidence.
 
 Actual response for the example request:
 
@@ -64,14 +68,19 @@ Actual response for the example request:
   "assessment": {
     "level": "high",
     "summary": "Several warning signs or a high-concern indicator were detected.",
-    "uncertain": true
+    "uncertain": true,
+    "contributing_sources": ["rule"]
   },
   "model": {
+    "available": false,
     "status": "unavailable",
     "label": null,
+    "prediction": null,
     "score": null,
     "score_name": null,
-    "limitation": "The local classifier artifact is not available yet; the rules-only fallback is active."
+    "model_version": null,
+    "limitation": "The local classifier artifact is not available; the rules-only fallback is active.",
+    "limitations": ["The local classifier artifact is not available; the rules-only fallback is active."]
   },
   "signals": [
     {
@@ -129,9 +138,19 @@ Messages over 10,000 characters, URLs over 2,048 characters, unsupported field t
 
 1. Submit the current form values to `/api/analyze` as JSON.
 2. Render `assessment.level`, `assessment.summary`, and the uncertainty notice first.
-3. Show ML status from `model`; the current state must be labelled unavailable/rules-only, not as an ML prediction.
+3. Show ML status from `model`. Show prediction/score only when `model.available` is true, and label the score as uncalibrated—not a probability or proof.
 4. Split `signals` by `source` to render rule findings separately from URL findings. Render each evidence snippet, reason, severity, and recommended action.
 5. Render `urls` separately, including per-URL parse errors. Do not attempt to open URLs to enrich the result.
 6. Always render `next_steps` and `limitations`, including on `low_indicators` results.
 
 For reusable demo content and expected outputs, see `tests/fixtures/demo_scenarios.json`. Those fixtures are regression/demo material only, not training data.
+
+## ML activation and safety
+
+The adapter looks only for `ml/artifacts/message_classifier.joblib` and runs it locally through `ml.classifier.predict_message`; it never sends a scanned message to another service or stores it. Missing or unreadable artifacts return a rules-only response with no prediction. Train the reviewed dataset first, then start/restart the API:
+
+```powershell
+python -m ml.train <reviewed-scam.csv> <reviewed-legitimate.csv> --artifact ml/artifacts/message_classifier.joblib
+python -m pytest tests/test_ml_integration.py -q
+python -m uvicorn app.main:app --reload
+```

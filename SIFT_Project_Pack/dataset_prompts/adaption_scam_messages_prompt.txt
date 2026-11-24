@@ -1,6 +1,9 @@
 SIFT — SCAM-POSITIVE BATCH PROMPT
+PROMPT_VERSION: sift-pilot-v2-scam
 
-Use the SIFT Dataset Generation Master Specification. Generate only clearly SCAM-labelled fictional inbound messages for an India-focused scam-message classifier. Aim for a balanced mix across these four families: fake jobs/internships, phishing/KYC/account pressure, UPI/payment/refund fraud, and reward/lottery bait. If one run is dedicated to a single family, focus exclusively on that family and vary scenarios within it.
+Use the SIFT Dataset Generation Master Specification. Generate only clearly SCAM-labelled fictional inbound messages for an India-focused scam-message classifier. The controlled pilot target is eight accepted examples in each family: `fake_job`, `phishing_kyc`, `upi_payment`, `reward_lottery`, and `other`. `other` must be a clearly deceptive family outside the first four; do not use it as a catch-all for uncertain labels. If one run is dedicated to a single family, focus exclusively on that family and vary scenarios within it.
+
+For the 40-row SCAM pilot, plan for 16 `en`, 8 `hi`, 12 `hinglish`, and 4 `mixed` examples. These are planning quotas: do not create implausible language merely to reach them.
 
 Examples should not all use the same “pay now” wording. Include varied channels, message lengths, sender framings, pressure tactics, and wording. Some examples may contain no URL; others may include a fictional reserved example domain. Include explicit fee demands, OTP/PIN/password requests, QR/refund manipulation, false selection/prize claims, and impersonation patterns where context makes the deceptive intent clear.
 

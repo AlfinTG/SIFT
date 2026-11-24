@@ -16,8 +16,18 @@ from pathlib import Path
 from typing import Any, Iterable
 
 
-REVIEW_FIELDS = ["sample_id", "review_status", "rejection_reason"]
+REVIEW_FIELDS = [
+    "sample_id",
+    "review_status",
+    "review_decision",
+    "reviewer_id",
+    "reviewed_at",
+    "review_notes",
+    "rejection_reason",
+]
 VALID_REVIEW_STATUSES = {"unreviewed", "accepted", "rejected", "needs_review"}
+PILOT_LABELS = {"SCAM", "LEGITIMATE", "AMBIGUOUS"}
+PILOT_LANGUAGES = {"en", "hi", "hinglish", "mixed"}
 TOKEN_PATTERN = re.compile(r"[\w₹]+", re.UNICODE)
 
 
@@ -25,11 +35,22 @@ def load_manifest(path: Path) -> dict[str, Any]:
     with path.open(encoding="utf-8") as file:
         manifest = json.load(file)
     strata = manifest.get("strata")
-    if not isinstance(strata, list) or len(strata) != 12:
-        raise ValueError("manifest must contain exactly 12 strata")
+    if not isinstance(strata, list) or len(strata) != 11:
+        raise ValueError("manifest must contain exactly 11 strata")
     required = {"stratum_id", "source_batch", "label", "context_family", "target_count", "difficulty", "template_family_prefix"}
     if any(not isinstance(item, dict) or required - item.keys() for item in strata):
         raise ValueError("each manifest stratum is missing required fields")
+    language_targets = manifest.get("language_targets")
+    if not isinstance(language_targets, dict) or set(language_targets) != PILOT_LABELS:
+        raise ValueError("manifest must contain language targets for every pilot label")
+    for label, targets in language_targets.items():
+        if not isinstance(targets, dict) or set(targets) != PILOT_LANGUAGES:
+            raise ValueError(f"language targets for {label} must cover every pilot language")
+        if any(not isinstance(count, int) or count < 0 for count in targets.values()):
+            raise ValueError(f"language targets for {label} must be non-negative integers")
+        stratum_total = sum(item["target_count"] for item in strata if item["label"] == label)
+        if sum(targets.values()) != stratum_total:
+            raise ValueError(f"language targets for {label} must equal its stratum target total")
     return manifest
 
 
@@ -39,6 +60,46 @@ def load_canonical_rows(paths: Iterable[Path]) -> list[dict[str, str]]:
         with path.open(newline="", encoding="utf-8") as file:
             rows.extend(dict(row) for row in csv.DictReader(file))
     return rows
+
+
+def load_review_ledger(path: Path) -> dict[str, dict[str, str]]:
+    """Read human review decisions without changing the canonical source CSV."""
+
+    required = {"sample_id", "review_decision", "reviewer_id", "reviewed_at", "review_notes"}
+    with path.open(newline="", encoding="utf-8") as file:
+        reader = csv.DictReader(file)
+        if reader.fieldnames is None or not required <= set(reader.fieldnames):
+            raise ValueError("review ledger is missing required traceability columns")
+        records = [dict(row) for row in reader]
+    ledger: dict[str, dict[str, str]] = {}
+    for record in records:
+        sample_id = record.get("sample_id", "").strip()
+        decision = record.get("review_decision", "").strip()
+        if not sample_id or decision not in VALID_REVIEW_STATUSES:
+            raise ValueError("review ledger contains an invalid sample_id or review_decision")
+        if sample_id in ledger:
+            raise ValueError("review ledger contains duplicate sample_id values")
+        if decision == "accepted" and (not record.get("reviewer_id", "").strip() or not record.get("reviewed_at", "").strip()):
+            raise ValueError("accepted review decisions require reviewer_id and reviewed_at")
+        ledger[sample_id] = record
+    return ledger
+
+
+def apply_review_ledger(rows: list[dict[str, str]], ledger: dict[str, dict[str, str]]) -> list[dict[str, str]]:
+    """Return derived rows with human decisions applied; never overwrite input CSVs."""
+
+    sample_ids = {row.get("sample_id", "") for row in rows}
+    unknown = set(ledger) - sample_ids
+    if unknown:
+        raise ValueError("review ledger references sample_id values absent from the input rows")
+    derived: list[dict[str, str]] = []
+    for row in rows:
+        updated = dict(row)
+        record = ledger.get(updated.get("sample_id", ""))
+        if record:
+            updated["review_status"] = record["review_decision"].strip()
+        derived.append(updated)
+    return derived
 
 
 def _normalise(text: str) -> str:
@@ -146,6 +207,29 @@ def quota_report(rows: list[dict[str, str]], manifest: dict[str, Any]) -> list[d
     return report
 
 
+def language_quota_report(rows: list[dict[str, str]], manifest: dict[str, Any]) -> list[dict[str, Any]]:
+    """Report planning quotas by label/language without forcing poor-quality rows in."""
+
+    report: list[dict[str, Any]] = []
+    for label, targets in manifest["language_targets"].items():
+        for language, target_count in targets.items():
+            matching = [row for row in rows if row.get("label") == label and row.get("language") == language]
+            statuses = Counter(row.get("review_status", "") for row in matching)
+            accepted = statuses["accepted"]
+            report.append({
+                "label": label,
+                "language": language,
+                "target_count": target_count,
+                "accepted_count": accepted,
+                "remaining": max(0, target_count - accepted),
+                "overflow": max(0, accepted - target_count),
+                "unreviewed_count": statuses["unreviewed"],
+                "needs_review_count": statuses["needs_review"],
+                "rejected_count": statuses["rejected"],
+            })
+    return report
+
+
 def build_review_report(rows: list[dict[str, str]], manifest: dict[str, Any]) -> dict[str, Any]:
     invalid_statuses = [
         {"sample_id": row.get("sample_id", ""), "reason": "invalid review_status"}
@@ -160,6 +244,10 @@ def build_review_report(rows: list[dict[str, str]], manifest: dict[str, Any]) ->
         {
             "sample_id": row.get("sample_id", ""),
             "review_status": "needs_review" if reasons[row.get("sample_id", "")] else row.get("review_status", "unreviewed"),
+            "review_decision": "needs_review" if reasons[row.get("sample_id", "")] else row.get("review_status", "unreviewed"),
+            "reviewer_id": "",
+            "reviewed_at": "",
+            "review_notes": "",
             "rejection_reason": "; ".join(reasons[row.get("sample_id", "")]),
         }
         for row in rows
@@ -172,6 +260,7 @@ def build_review_report(rows: list[dict[str, str]], manifest: dict[str, Any]) ->
         "review_status_findings": invalid_statuses,
         "review_ledger": ledger,
         "quota_report": quota_report(rows, manifest),
+        "language_quota_report": language_quota_report(rows, manifest),
     }
 
 
@@ -189,9 +278,12 @@ def main() -> None:
     parser.add_argument("--manifest", type=Path, default=Path(__file__).with_name("pilot_manifest.json"))
     parser.add_argument("--report", type=Path, required=True, help="Destination for a derived JSON report")
     parser.add_argument("--ledger", type=Path, help="Optional derived review ledger CSV")
+    parser.add_argument("--review-ledger-input", type=Path, help="Completed human review ledger used only to derive statuses and accepted output")
     parser.add_argument("--accepted-output", type=Path, help="Optional export of rows already marked accepted")
     arguments = parser.parse_args()
     rows = load_canonical_rows(arguments.inputs)
+    if arguments.review_ledger_input:
+        rows = apply_review_ledger(rows, load_review_ledger(arguments.review_ledger_input))
     report = build_review_report(rows, load_manifest(arguments.manifest))
     arguments.report.parent.mkdir(parents=True, exist_ok=True)
     arguments.report.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")

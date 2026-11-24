@@ -46,18 +46,84 @@ These limits support long pasted messages while preventing unbounded local proce
 
 ## Dataset conversion (offline)
 
-When a reviewed Adaption pilot has been exported as JSONL, preserve the untouched export under `ml/data/raw/` and convert it locally:
+When the `sift-pilot-v2-scam-40` Adaption export is ready, preserve the untouched JSONL under `ml/data/raw/` and convert it locally:
 
 ```powershell
-python -m ml.prepare_dataset ml/data/raw/pilot.jsonl --output-directory ml/data/processed/pilot-v1 --source-batch pilot-v1 --generation-prompt-version v1
+python -m ml.prepare_dataset ml/data/raw/sift-pilot-v2-scam-40.jsonl --output-directory ml/data/processed/sift-pilot-v2-scam-40 --source-batch sift-pilot-v2-scam-40 --generation-prompt-version sift-pilot-v2
 ```
 
-The converter extracts only text between the required message delimiters, validates completion JSON and exact evidence quotes, separates `AMBIGUOUS` rows, records rejected rows with a reason, and rejects exact duplicate messages. The accepted rows remain `unreviewed` and must be audited before any model training.
+The converter expects JSONL objects containing an `enhanced_prompt`, `prompt`, or `original_prompt` string with the required message delimiters, plus a `completion`, `output`, or `response` JSON object/string. It extracts only the message, validates completion JSON and exact evidence quotes, separates `AMBIGUOUS` rows, records rejected rows with a reason, and rejects exact duplicate messages. Every converted row remains `unreviewed`.
+
+Create the review report and an editable ledger:
+
+```powershell
+python -m ml.dataset_review ml/data/processed/sift-pilot-v2-scam-40/accepted.csv ml/data/processed/sift-pilot-v2-scam-40/ambiguous.csv --manifest ml/pilot_manifest.json --report ml/data/processed/sift-pilot-v2-scam-40/review-report.json --ledger ml/data/processed/sift-pilot-v2-scam-40/review-ledger.csv
+```
+
+After human reviewers have completed the ledger, derive—without overwriting the converter output—a traceable accepted export:
+
+```powershell
+python -m ml.dataset_review ml/data/processed/sift-pilot-v2-scam-40/accepted.csv ml/data/processed/sift-pilot-v2-scam-40/ambiguous.csv --manifest ml/pilot_manifest.json --review-ledger-input ml/data/processed/sift-pilot-v2-scam-40/review-ledger.csv --report ml/data/processed/sift-pilot-v2-scam-40/final-review-report.json --accepted-output ml/data/processed/sift-pilot-v2-scam-40/accepted-reviewed.csv
+```
+
+An accepted ledger decision requires a reviewer ID and ISO 8601 review time. `ml/data/` is ignored by Git, so raw exports and derived data are not accidentally committed.
 
 Run the focused tests with:
 
 ```powershell
 python -m pytest
 ```
+
+## Offline ML baseline
+
+The training pipeline is local-only and does not call the API or retain submitted messages. It accepts canonical CSV files, uses only rows whose `review_status` is `accepted` and whose label is `SCAM` or `LEGITIMATE`, and uses only `message_text` as a model feature. `AMBIGUOUS`, rejected, and unreviewed rows are excluded.
+
+Train after both reviewed class exports are available:
+
+```powershell
+python -m ml.train ml/data/processed/sift-pilot-v2-scam-40/accepted-reviewed.csv ml/data/processed/sift-pilot-v2-legitimate-40/accepted-reviewed.csv --artifact ml/artifacts/message_classifier.joblib --report ml/data/evaluation/training-report.json
+```
+
+The trainer uses group-aware train/validation/test splits based on `template_family`; it fails rather than silently creating a leaking or one-class split. The report contains SCAM precision, recall, F1, a confusion matrix, false-positive/false-negative counts, split IDs, and limitations. It does not describe scores as calibrated probabilities.
+
+Evaluate a saved model only on a separately reviewed challenge CSV whose sample IDs do not overlap training IDs:
+
+```powershell
+python -m ml.evaluate ml/data/evaluation/independent-challenge.csv --artifact ml/artifacts/message_classifier.joblib --report ml/data/evaluation/external-evaluation.json
+```
+
+Validate input before fitting, or smoke-test a saved model locally:
+
+```powershell
+python -m ml.validate_dataset ml/data/processed/sift-pilot-v2-scam-40/accepted-reviewed.csv ml/data/processed/sift-pilot-v2-legitimate-40/accepted-reviewed.csv
+python -m ml.predict "Pay a registration fee today to secure your internship." --artifact ml/artifacts/message_classifier.joblib
+```
+
+Models and evaluation files stay under Git-ignored `ml/artifacts/` and `ml/data/evaluation/` directories.
+
+## Hybrid local analysis
+
+`POST /api/analyze` now checks for `ml/artifacts/message_classifier.joblib` locally. If present and readable, the API returns an additional ML prediction and bounded uncalibrated model score; a SCAM prediction adds a supporting medium-severity signal. Existing deterministic rules and URL inspection remain independent: explicit credential/payment rules are never overridden by a model prediction, and a model alone cannot create a critical verdict.
+
+If the artifact is missing or inference fails, the API remains usable in clearly marked rules-only fallback mode, with no fabricated prediction or score. After training reviewed SCAM and LEGITIMATE data, place the artifact at the default path and restart the server:
+
+```powershell
+python -m ml.train <reviewed-scam.csv> <reviewed-legitimate.csv> --artifact ml/artifacts/message_classifier.joblib
+python -m pytest tests/test_ml_integration.py -q
+python -m uvicorn app.main:app --reload
+```
+
+Model input stays local and is not persisted or sent to external services. See [`docs/API.md`](docs/API.md) for the full ML response contract and limitations.
+
+## Demo runbook
+
+Start SIFT with:
+
+```powershell
+python -m pytest -q
+python -m uvicorn app.main:app --reload
+```
+
+Open `http://127.0.0.1:8000/`. For a concise demo, use the built-in fake internship scenario, the UPI refund/PIN scenario, the shortened-URL scenario, and the legitimate OTP safety reminder. Explain that SIFT shows indicators and safe next steps, not a verdict of verified safety. The ML panel stays correctly unavailable until a reviewed model artifact exists.
 
 Core analysis will remain local. SIFT will not open submitted URLs, perform live reputation checks, or store raw submitted messages by default.

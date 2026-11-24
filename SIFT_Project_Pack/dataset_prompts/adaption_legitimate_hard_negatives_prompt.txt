@@ -1,6 +1,9 @@
 SIFT — LEGITIMATE HARD-NEGATIVE BATCH PROMPT
+PROMPT_VERSION: sift-pilot-v2-legitimate
 
-Use the SIFT Dataset Generation Master Specification. Generate only LEGITIMATE fictional inbound messages for an India-focused scam-message classifier. These are important hard negatives: they should look realistic and may share vocabulary or contexts with scam messages, but must not contain a deceptive request.
+Use the SIFT Dataset Generation Master Specification. Generate only LEGITIMATE fictional inbound messages for an India-focused scam-message classifier. These are important hard negatives: they should look realistic and may share vocabulary or contexts with scam messages, but must not contain a deceptive request. The controlled pilot target is eight accepted examples in each context: employment/recruitment, banking/OTP/KYC safety, payments/refunds/UPI, delivery/rewards/promotions, and miscellaneous legitimate communications.
+
+For the 40-row LEGITIMATE pilot, plan for 16 `en`, 8 `hi`, 12 `hinglish`, and 4 `mixed` examples. These are planning quotas: natural language and correct labels take priority.
 
 Include a varied mix of:
 - Protective warnings such as “Never share your OTP, password, or UPI PIN.”

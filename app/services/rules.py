@@ -116,7 +116,7 @@ def analyze_message_rules(message: str) -> list[EvidenceSignal]:
         )
 
     refund_manipulation = _first_actionable_match(
-        r"\b(?:scan\s+(?:the\s+)?qr(?:\s+code)?|enter\s+(?:your\s+)?upi\s*pin|approve\s+(?:the\s+)?collect)\b",
+        r"\b(?:scan\s+(?:the\s+)?qr(?:\s+code)?|qr\s+scan|enter\s+(?:your\s+)?upi\s*pin|approve\s+(?:the\s+)?collect)\b",
         text,
     )
     payment_context = re.search(r"\b(?:refund|refunds|payment|receive\s+(?:the\s+)?amount|cashback)\b", text, re.I)

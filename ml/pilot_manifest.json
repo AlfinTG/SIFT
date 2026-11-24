@@ -1,18 +1,29 @@
 {
-  "manifest_version": "sift-pilot-v1",
-  "description": "Controlled 96-row synthetic pilot. Counts apply only to manually accepted rows.",
+  "manifest_version": "sift-pilot-v2",
+  "description": "Controlled 96-row synthetic pilot. Counts apply only to manually accepted rows; quality and naturalness take precedence over quotas.",
+  "batch_metadata_requirements": [
+    "source_batch",
+    "generation_prompt_version",
+    "generation_date",
+    "raw_filename",
+    "reviewer_owner"
+  ],
+  "language_targets": {
+    "SCAM": {"en": 16, "hi": 8, "hinglish": 12, "mixed": 4},
+    "LEGITIMATE": {"en": 16, "hi": 8, "hinglish": 12, "mixed": 4},
+    "AMBIGUOUS": {"en": 6, "hi": 4, "hinglish": 4, "mixed": 2}
+  },
   "strata": [
-    {"stratum_id":"scam-fake_job","source_batch":"sift-pilot-v1-scam","label":"SCAM","context_family":"fake_job","target_count":10,"difficulty":"easy_or_edge_case","template_family_prefix":"sift-pilot-v1-scam-fake_job-"},
-    {"stratum_id":"scam-phishing_kyc","source_batch":"sift-pilot-v1-scam","label":"SCAM","context_family":"phishing_kyc","target_count":10,"difficulty":"easy_or_edge_case","template_family_prefix":"sift-pilot-v1-scam-phishing_kyc-"},
-    {"stratum_id":"scam-upi_payment","source_batch":"sift-pilot-v1-scam","label":"SCAM","context_family":"upi_payment","target_count":10,"difficulty":"easy_or_edge_case","template_family_prefix":"sift-pilot-v1-scam-upi_payment-"},
-    {"stratum_id":"scam-reward_lottery","source_batch":"sift-pilot-v1-scam","label":"SCAM","context_family":"reward_lottery","target_count":10,"difficulty":"easy_or_edge_case","template_family_prefix":"sift-pilot-v1-scam-reward_lottery-"},
-    {"stratum_id":"legitimate-fake_job","source_batch":"sift-pilot-v1-legitimate","label":"LEGITIMATE","context_family":"fake_job","target_count":10,"difficulty":"hard_negative","template_family_prefix":"sift-pilot-v1-legitimate-fake_job-"},
-    {"stratum_id":"legitimate-phishing_kyc","source_batch":"sift-pilot-v1-legitimate","label":"LEGITIMATE","context_family":"phishing_kyc","target_count":10,"difficulty":"hard_negative","template_family_prefix":"sift-pilot-v1-legitimate-phishing_kyc-"},
-    {"stratum_id":"legitimate-upi_payment","source_batch":"sift-pilot-v1-legitimate","label":"LEGITIMATE","context_family":"upi_payment","target_count":10,"difficulty":"hard_negative","template_family_prefix":"sift-pilot-v1-legitimate-upi_payment-"},
-    {"stratum_id":"legitimate-reward_lottery","source_batch":"sift-pilot-v1-legitimate","label":"LEGITIMATE","context_family":"reward_lottery","target_count":10,"difficulty":"hard_negative","template_family_prefix":"sift-pilot-v1-legitimate-reward_lottery-"},
-    {"stratum_id":"ambiguous-fake_job","source_batch":"sift-pilot-v1-ambiguous","label":"AMBIGUOUS","context_family":"fake_job","target_count":4,"difficulty":"ambiguous","template_family_prefix":"sift-pilot-v1-ambiguous-fake_job-"},
-    {"stratum_id":"ambiguous-phishing_kyc","source_batch":"sift-pilot-v1-ambiguous","label":"AMBIGUOUS","context_family":"phishing_kyc","target_count":4,"difficulty":"ambiguous","template_family_prefix":"sift-pilot-v1-ambiguous-phishing_kyc-"},
-    {"stratum_id":"ambiguous-upi_payment","source_batch":"sift-pilot-v1-ambiguous","label":"AMBIGUOUS","context_family":"upi_payment","target_count":4,"difficulty":"ambiguous","template_family_prefix":"sift-pilot-v1-ambiguous-upi_payment-"},
-    {"stratum_id":"ambiguous-reward_lottery","source_batch":"sift-pilot-v1-ambiguous","label":"AMBIGUOUS","context_family":"reward_lottery","target_count":4,"difficulty":"ambiguous","template_family_prefix":"sift-pilot-v1-ambiguous-reward_lottery-"}
+    {"stratum_id":"scam-fake_job","source_batch":"sift-pilot-v2-scam-40","label":"SCAM","context_family":"fake_job","target_count":8,"difficulty":"easy_or_edge_case","template_family_prefix":"sift-pilot-v2-scam-fake_job-"},
+    {"stratum_id":"scam-phishing_kyc","source_batch":"sift-pilot-v2-scam-40","label":"SCAM","context_family":"phishing_kyc","target_count":8,"difficulty":"easy_or_edge_case","template_family_prefix":"sift-pilot-v2-scam-phishing_kyc-"},
+    {"stratum_id":"scam-upi_payment","source_batch":"sift-pilot-v2-scam-40","label":"SCAM","context_family":"upi_payment","target_count":8,"difficulty":"easy_or_edge_case","template_family_prefix":"sift-pilot-v2-scam-upi_payment-"},
+    {"stratum_id":"scam-reward_lottery","source_batch":"sift-pilot-v2-scam-40","label":"SCAM","context_family":"reward_lottery","target_count":8,"difficulty":"easy_or_edge_case","template_family_prefix":"sift-pilot-v2-scam-reward_lottery-"},
+    {"stratum_id":"scam-other","source_batch":"sift-pilot-v2-scam-40","label":"SCAM","context_family":"other","target_count":8,"difficulty":"easy_or_edge_case","template_family_prefix":"sift-pilot-v2-scam-other-"},
+    {"stratum_id":"legitimate-employment_recruitment","source_batch":"sift-pilot-v2-legitimate","label":"LEGITIMATE","context_family":"employment_recruitment","target_count":8,"difficulty":"hard_negative","template_family_prefix":"sift-pilot-v2-legitimate-employment_recruitment-"},
+    {"stratum_id":"legitimate-banking_otp_kyc_safety","source_batch":"sift-pilot-v2-legitimate","label":"LEGITIMATE","context_family":"banking_otp_kyc_safety","target_count":8,"difficulty":"hard_negative","template_family_prefix":"sift-pilot-v2-legitimate-banking_otp_kyc_safety-"},
+    {"stratum_id":"legitimate-payments_refunds_upi","source_batch":"sift-pilot-v2-legitimate","label":"LEGITIMATE","context_family":"payments_refunds_upi","target_count":8,"difficulty":"hard_negative","template_family_prefix":"sift-pilot-v2-legitimate-payments_refunds_upi-"},
+    {"stratum_id":"legitimate-delivery_rewards_promotions","source_batch":"sift-pilot-v2-legitimate","label":"LEGITIMATE","context_family":"delivery_rewards_promotions","target_count":8,"difficulty":"hard_negative","template_family_prefix":"sift-pilot-v2-legitimate-delivery_rewards_promotions-"},
+    {"stratum_id":"legitimate-miscellaneous","source_batch":"sift-pilot-v2-legitimate","label":"LEGITIMATE","context_family":"miscellaneous","target_count":8,"difficulty":"hard_negative","template_family_prefix":"sift-pilot-v2-legitimate-miscellaneous-"},
+    {"stratum_id":"ambiguous-review","source_batch":"sift-pilot-v2-ambiguous","label":"AMBIGUOUS","context_family":"ambiguous_review","target_count":16,"difficulty":"ambiguous","template_family_prefix":"sift-pilot-v2-ambiguous-"}
   ]
 }

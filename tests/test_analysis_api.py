@@ -108,3 +108,32 @@ def test_critical_rule_outweighs_other_conflicting_indicators() -> None:
         "account_pressure",
         "urgency_pressure",
     }
+
+
+def test_demo_edge_cases_remain_cautious_and_local() -> None:
+    cases = [
+        ("Your job application is received. No fee is required.", "low_indicators"),
+        ("Refund complete: ₹500 has been credited. No action is needed.", "low_indicators"),
+        ("Your account needs attention.", "low_indicators"),
+        ("सुरक्षा सूचना: अपना OTP किसी के साथ साझा न करें।", "low_indicators"),
+        ("Aapka refund pending hai, QR scan karke UPI PIN enter karein.", "critical"),
+    ]
+    for message, expected_level in cases:
+        response = client.post("/api/analyze", json={"message": message})
+        assert response.status_code == 200
+        body = response.json()
+        assert body["assessment"]["level"] == expected_level
+        assert body["assessment"]["uncertain"] is True
+        assert body["model"]["available"] is False
+
+
+def test_multiple_links_are_inspected_without_network_access() -> None:
+    response = client.post(
+        "/api/analyze",
+        json={"message": "Review https://bit.ly/offer and https://198.51.100.7/login."},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body["urls"]) == 2
+    assert {signal["signal_id"] for signal in body["signals"]} >= {"url_shortener", "ip_address_host"}

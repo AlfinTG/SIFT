@@ -64,6 +64,15 @@ def test_frontend_integration():
     assert d4['assessment']['level'] == 'moderate'
     assert any(s['signal_id'] == 'url_shortener' for s in d4['signals'])
 
+    # The frontend sends an empty string, not null, for URL-only input because
+    # the API's message field is non-nullable.
+    resp_url_only = client.post('/api/analyze', json={
+        'message': '',
+        'url': 'https://bit.ly/offer',
+        'include_url_inspection': True
+    })
+    assert resp_url_only.status_code == 200
+
     # 8. Scan IP Host URL
     resp_scan5 = client.post('/api/analyze', json={
         'url': 'https://198.51.100.7/login',

@@ -1,0 +1,10 @@
+SIFT — AMBIGUOUS REVIEW BATCH PROMPT
+PROMPT_VERSION: sift-pilot-v2-ambiguous
+
+Use the SIFT Dataset Generation Master Specification. Generate only AMBIGUOUS-labelled fictional inbound messages for separate human review and challenge testing. These rows are never binary-classifier training data.
+
+Create genuine uncertainty: incomplete context, competing benign and concerning interpretations, or evidence insufficient to decide whether the requested action is deceptive. Do not disguise clearly SCAM messages as ambiguous, and do not use harmless generic filler. Do not add a hidden explanation outside the message that resolves the ambiguity.
+
+For the 16-row AMBIGUOUS pilot, plan for 6 `en`, 4 `hi`, 4 `hinglish`, and 2 `mixed` examples. These are planning quotas only; naturalness and honest uncertainty take priority. Vary channel, length, scenario, and template family. Use `scam_type` = `none` unless a contextual family can be named without converting the uncertain label into a claim of fraud.
+
+Completion JSON must follow the master specification, use `label` = `AMBIGUOUS`, `difficulty` = `ambiguous`, and contain exact evidence quotes plus a rationale explaining the missing or conflicting context.

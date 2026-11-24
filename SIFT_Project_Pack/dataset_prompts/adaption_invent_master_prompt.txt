@@ -1,4 +1,5 @@
 SIFT DATASET GENERATION — MASTER SPECIFICATION
+PROMPT_VERSION: sift-pilot-v2-master
 
 Create a high-diversity synthetic dataset of short inbound digital messages for training and evaluating a scam-message classifier for an India-focused consumer safety prototype called SIFT. These are fictional examples, not real messages. The output must be an instruction dataset consisting of one classification prompt and one structured completion per row.
 
@@ -47,6 +48,13 @@ Vary naturally across rows:
 INDIA-RELEVANT CONTEXT
 Use plausible Indian context where appropriate: ₹ amounts, UPI, KYC, internships, campus placement, courier deliveries, bill payments, and common mobile messaging language. Use English as the primary language. Include a modest variety of natural Hinglish only when requested by the batch prompt. Do not caricature speakers or use implausible slang.
 
+LANGUAGE LABELLING
+- Use `en` only for messages that are predominantly English.
+- Use `hi` only for Hindi written predominantly in Devanagari.
+- Use `hinglish` for natural Hindi-English mixing, usually in Roman/Latin script. An English message with an isolated Hindi word is not Hinglish.
+- Use `mixed` only when material use of more than one language or script makes one primary category misleading.
+- Follow the batch's language planning quota as far as quality permits. Naturalness, label correctness, and plausible wording take priority over mechanically filling a quota.
+
 SAFETY AND PRIVACY
 - Use fictional organization names and fictional people.
 - Use reserved example domains such as `example.com` or `.example`; never create a live malicious URL.
@@ -63,5 +71,6 @@ LABEL QUALITY
 - Use AMBIGUOUS when key context is missing. Do not overstate certainty.
 - Every evidence quote must appear exactly in the message.
 - The rationale must agree with the label and evidence.
+- Use a stable `template_family` that identifies the conceptual message pattern. Do not reuse a template family for superficial rewrites of the same message.
 
 Do not include analysis of the generation task, dataset statistics, headings, or multiple messages in a single row. Each row must represent one distinct inbound message and one corresponding completion.

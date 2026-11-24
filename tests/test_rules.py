@@ -45,3 +45,9 @@ def test_explicit_payment_and_credential_signals_override_low_urgency() -> None:
     )
 
     assert {"upi_refund_manipulation", "urgency_pressure"} <= ids
+
+
+def test_hinglish_qr_scan_word_order_is_contextual_payment_signal() -> None:
+    ids = signal_ids("Aapka refund pending hai, QR scan karke UPI PIN enter karein.")
+
+    assert "upi_refund_manipulation" in ids

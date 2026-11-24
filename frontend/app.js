@@ -26,6 +26,7 @@
   // Layer 3 (Technical Details) elements
   const engineStatusTag = document.querySelector("#engineStatusTag");
   const engineLimitationText = document.querySelector("#engineLimitationText");
+  const mlModelDetails = document.querySelector("#mlModelDetails");
   const technicalUrlContainer = document.querySelector("#technicalUrlContainer");
   const technicalUrlList = document.querySelector("#technicalUrlList");
   const technicalLimitationsList = document.querySelector("#technicalLimitationsList");
@@ -276,6 +277,18 @@
     if (engineLimitationText) {
       engineLimitationText.textContent = data.model?.limitation || "The local rule engine evaluated this content without remote ML model dependencies.";
     }
+    if (mlModelDetails) {
+      mlModelDetails.replaceChildren();
+      const model = data.model || {};
+      if (model.available && model.prediction && typeof model.score === "number") {
+        const title = createEl("p", "font-bold text-[#003523]", `Local model signal: ${model.prediction}`);
+        const detail = createEl("p", "mt-1", `Model score: ${model.score.toFixed(2)}. This is an uncalibrated model score, not a probability or proof.`);
+        mlModelDetails.append(title, detail);
+        mlModelDetails.classList.remove("hidden");
+      } else {
+        mlModelDetails.classList.add("hidden");
+      }
+    }
 
     // URL parsing breakdown
     if (technicalUrlList) {
@@ -350,7 +363,7 @@
 
     // Prepare JSON payload according to API contract
     const payload = {
-      message: isUrlOnly ? null : rawInput,
+      message: isUrlOnly ? "" : rawInput,
       url: isUrlOnly ? rawInput : null,
       include_url_inspection: true,
       incident_status: incidentStatus ? incidentStatus.value : "received_only"

@@ -20,6 +20,13 @@ Report:
 
 Document whether the test data is synthetic, public, manually authored, or mixed. If the test set is derived from the same generation prompt/batch as training, explicitly disclose that limitation and do not use it as strong generalization evidence.
 
+## 2.1 Integration evaluation
+
+- With no artifact at `ml/artifacts/message_classifier.joblib`, `/api/analyze` must return `model.available=false`, `model.status="unavailable"`, and no prediction or score while rules and URL inspection remain active.
+- A SCAM model prediction is a supporting medium-severity ML signal only; it cannot independently produce a critical result.
+- A LEGITIMATE model prediction must never suppress deterministic rule or URL evidence.
+- Model scores are uncalibrated scores, not fraud probabilities. Test the model adapter, fusion behavior, unavailable/error fallbacks, API schema, and frontend rendering with `python -m pytest tests/test_ml_integration.py -q`.
+
 ## 3. Functional test matrix
 
 | Case | Expected behavior |
