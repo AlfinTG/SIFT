@@ -59,17 +59,22 @@ python -m ml.prepare_dataset ml/data/raw/sift-pilot-v2-scam-40.jsonl --output-di
 
 The converter accepts JSONL objects or Adaption CSV rows. Both formats require an `enhanced_prompt`, `prompt`, or `original_prompt` string with the required message delimiters plus an `enhanced_completion`, `completion`, `output`, or `response` JSON object/string; a strictly fenced JSON completion is also accepted. It extracts only the message, validates completion JSON and exact evidence quotes, separates `AMBIGUOUS` rows, records rejected rows with a reason, and rejects exact duplicate messages. Every converted row remains `unreviewed`.
 
-Create the review report and an editable ledger:
+For the current candidate set, use the consolidated review ledger (the v3 SCAM
+batch plus the LEGITIMATE batch):
 
 ```powershell
-python -m ml.dataset_review ml/data/processed/sift-pilot-v2-scam-40/accepted.csv ml/data/processed/sift-pilot-v2-scam-40/ambiguous.csv --manifest ml/pilot_manifest.json --report ml/data/processed/sift-pilot-v2-scam-40/review-report.json --ledger ml/data/processed/sift-pilot-v2-scam-40/review-ledger.csv
+python -m ml.consolidate_review ml/data/processed/sift-pilot-v2-legitimate-40/accepted.csv ml/data/processed/sift-pilot-v3-scam-fake-job/accepted.csv --raw "ml/data/raw/SIFT sift-pilot-v2 LEGITIMATE 40.csv" "ml/data/raw/SIFT pilot v3 SCAM fake_job structural validation batch.csv" "ml/data/raw/SIFT sift-pilot-v2 SCAM 40.csv" "ml/data/raw/SIFT sift-pilot-v2 SCAM 40_1.csv" --audit ml/data/review/consolidated-audit.json --ledger ml/data/review/consolidated-review-ledger.csv --package ml/data/review/consolidated-human-review-package.md
 ```
 
 After human reviewers have completed the ledger, derive—without overwriting the converter output—a traceable accepted export:
 
 ```powershell
-python -m ml.dataset_review ml/data/processed/sift-pilot-v2-scam-40/accepted.csv ml/data/processed/sift-pilot-v2-scam-40/ambiguous.csv --manifest ml/pilot_manifest.json --review-ledger-input ml/data/processed/sift-pilot-v2-scam-40/review-ledger.csv --report ml/data/processed/sift-pilot-v2-scam-40/final-review-report.json --accepted-output ml/data/processed/sift-pilot-v2-scam-40/accepted-reviewed.csv
+python -m ml.dataset_review ml/data/processed/sift-pilot-v2-legitimate-40/accepted.csv ml/data/processed/sift-pilot-v3-scam-fake-job/accepted.csv --manifest ml/pilot_manifest.json --review-ledger-input ml/data/review/consolidated-review-ledger.csv --report ml/data/review/final-review-report.json --accepted-output ml/data/review/accepted-reviewed.csv
 ```
+
+The derived export carries the accepted decision, reviewer ID, and review time.
+The release training and validation commands reject an `accepted` CSV that
+lacks this traceability; editing `review_status` alone is not a valid approval.
 
 An accepted ledger decision requires a reviewer ID and ISO 8601 review time. `ml/data/` is ignored by Git, so raw exports and derived data are not accidentally committed.
 
@@ -86,7 +91,7 @@ The training pipeline is local-only and does not call the API or retain submitte
 Train after both reviewed class exports are available:
 
 ```powershell
-python -m ml.train ml/data/processed/sift-pilot-v2-scam-40/accepted-reviewed.csv ml/data/processed/sift-pilot-v2-legitimate-40/accepted-reviewed.csv --artifact ml/artifacts/message_classifier.joblib --report ml/data/evaluation/training-report.json
+python -m ml.train ml/data/review/accepted-reviewed.csv --artifact ml/artifacts/message_classifier.joblib --report ml/data/evaluation/training-report.json
 ```
 
 The trainer uses group-aware train/validation/test splits based on `template_family`; it fails rather than silently creating a leaking or one-class split. The report contains SCAM precision, recall, F1, a confusion matrix, false-positive/false-negative counts, split IDs, and limitations. It does not describe scores as calibrated probabilities.
@@ -100,7 +105,7 @@ python -m ml.evaluate ml/data/evaluation/independent-challenge.csv --artifact ml
 Validate input before fitting, or smoke-test a saved model locally:
 
 ```powershell
-python -m ml.validate_dataset ml/data/processed/sift-pilot-v2-scam-40/accepted-reviewed.csv ml/data/processed/sift-pilot-v2-legitimate-40/accepted-reviewed.csv
+python -m ml.validate_dataset ml/data/review/accepted-reviewed.csv
 python -m ml.predict "Pay a registration fee today to secure your internship." --artifact ml/artifacts/message_classifier.joblib
 ```
 

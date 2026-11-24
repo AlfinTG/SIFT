@@ -6,6 +6,13 @@ The training gate is correctly blocking model training because no eligible row
 has a completed, attributable human `accepted` decision. No model artifact or
 evaluation metrics were fabricated.
 
+An untraceable artifact and its reports that were generated after bulk-changing
+row statuses were quarantined under the ignored ML artifact/evaluation folders.
+They are not compatible with the current artifact format and are not loaded by
+the application. The bulk-approval helper now refuses to change data, and
+release training requires the reviewer decision, reviewer ID, and ISO-8601
+review time in the derived export.
+
 ## Dataset
 
 - Raw files inspected: four CSV exports (126 CSV records total).
@@ -59,7 +66,7 @@ URL analysis active. An ML SCAM result is a supporting medium signal only;
 deterministic critical/high signals retain precedence. The API schema and
 frontend model-state rendering are covered by tests.
 
-- Full regression suite: `python -m pytest -q` — **61 passed**.
+- Full regression suite: `python -m pytest -q` — **62 passed**.
 - Training gate: intentionally failed due to zero approved rows.
 - No separate frontend build or static type-check command is configured in this
   Python/vanilla-JS repository.

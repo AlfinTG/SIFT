@@ -105,3 +105,6 @@ def test_completed_ledger_derives_traceable_accepted_export(tmp_path) -> None:
         writer.writerow({"sample_id": "reviewed-one", "review_decision": "accepted", "reviewer_id": "reviewer-a", "reviewed_at": "2026-11-24T10:00:00+05:30", "review_notes": "Evidence and language verified."})
     derived = apply_review_ledger([sample], load_review_ledger(ledger_path))
     assert derived[0]["review_status"] == "accepted"
+    assert derived[0]["review_decision"] == "accepted"
+    assert derived[0]["reviewer_id"] == "reviewer-a"
+    assert derived[0]["reviewed_at"] == "2026-11-24T10:00:00+05:30"

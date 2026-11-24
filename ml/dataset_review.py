@@ -25,6 +25,7 @@ REVIEW_FIELDS = [
     "review_notes",
     "rejection_reason",
 ]
+REVIEW_TRACE_FIELDS = ["review_decision", "reviewer_id", "reviewed_at", "review_notes"]
 VALID_REVIEW_STATUSES = {"unreviewed", "accepted", "rejected", "needs_review"}
 PILOT_LABELS = {"SCAM", "LEGITIMATE", "AMBIGUOUS"}
 PILOT_LANGUAGES = {"en", "hi", "hinglish", "mixed"}
@@ -98,6 +99,10 @@ def apply_review_ledger(rows: list[dict[str, str]], ledger: dict[str, dict[str, 
         record = ledger.get(updated.get("sample_id", ""))
         if record:
             updated["review_status"] = record["review_decision"].strip()
+            # Keep decision provenance in the derived export.  Training uses it
+            # as a gate; it is never exposed as a model feature.
+            for field in REVIEW_TRACE_FIELDS:
+                updated[field] = record.get(field, "").strip()
         derived.append(updated)
     return derived
 

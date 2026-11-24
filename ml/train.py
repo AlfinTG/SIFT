@@ -17,7 +17,10 @@ def main() -> None:
     parser.add_argument("--random-state", type=int, default=42)
     arguments = parser.parse_args()
 
-    dataset = load_accepted_dataset(arguments.datasets)
+    # Command-line training is a release operation, so require a derived export
+    # carrying the reviewer decision, identity, and timestamp.  The lower-level
+    # loader remains usable in unit tests and exploratory notebooks.
+    dataset = load_accepted_dataset(arguments.datasets, require_review_traceability=True)
     pipeline, splits, report = train(dataset, random_state=arguments.random_state)
     save_artifact(arguments.artifact, pipeline, training_sample_ids=[row["sample_id"] for row in splits.train.rows])
     write_json(arguments.report, report)

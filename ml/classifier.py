@@ -24,7 +24,8 @@ CANONICAL_FIELDS = {
     "evidence_quotes", "rationale", "difficulty", "source", "source_batch",
     "generation_prompt_version", "template_family", "review_status",
 }
-ARTIFACT_VERSION = 1
+ARTIFACT_VERSION = 2
+REVIEW_TRACE_FIELDS = {"review_decision", "reviewer_id", "reviewed_at"}
 
 
 class DatasetValidationError(ValueError):
@@ -67,7 +68,7 @@ class Prediction:
     score_name: str = "model_score_not_calibrated_probability"
 
 
-def load_accepted_dataset(paths: Iterable[Path]) -> Dataset:
+def load_accepted_dataset(paths: Iterable[Path], *, require_review_traceability: bool = False) -> Dataset:
     """Load only human-accepted binary rows from canonical CSV exports.
 
     Metadata is validated for schema integrity but is never exposed to the model.
@@ -79,6 +80,10 @@ def load_accepted_dataset(paths: Iterable[Path]) -> Dataset:
             reader = csv.DictReader(file)
             if reader.fieldnames is None or not CANONICAL_FIELDS <= set(reader.fieldnames):
                 raise DatasetValidationError(f"{path} is missing canonical dataset fields")
+            if require_review_traceability and not REVIEW_TRACE_FIELDS <= set(reader.fieldnames):
+                raise DatasetValidationError(
+                    f"{path} is missing review traceability fields; derive it from a completed review ledger before training"
+                )
             for row_number, row in enumerate(reader, start=2):
                 if not row.get("sample_id", "").strip() or not row.get("message_text", "").strip():
                     raise DatasetValidationError(f"{path}:{row_number} has a blank sample_id or message_text")
@@ -87,6 +92,15 @@ def load_accepted_dataset(paths: Iterable[Path]) -> Dataset:
                 if label not in {"SCAM", "LEGITIMATE", "AMBIGUOUS"}:
                     raise DatasetValidationError(f"{path}:{row_number} has an invalid label")
                 if status == "accepted" and label in TRAINING_LABELS:
+                    if require_review_traceability:
+                        if row.get("review_decision", "").strip() != "accepted":
+                            raise DatasetValidationError(f"{path}:{row_number} is accepted without an accepted review decision")
+                        if not row.get("reviewer_id", "").strip() or not row.get("reviewed_at", "").strip():
+                            raise DatasetValidationError(f"{path}:{row_number} is accepted without reviewer traceability")
+                        try:
+                            datetime.fromisoformat(row["reviewed_at"].strip().replace("Z", "+00:00"))
+                        except ValueError as error:
+                            raise DatasetValidationError(f"{path}:{row_number} has a non-ISO review timestamp") from error
                     normalised = dict(row)
                     normalised["label"] = label
                     rows.append(normalised)

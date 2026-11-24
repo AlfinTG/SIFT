@@ -7,6 +7,7 @@ from ml.classifier import (
     CANONICAL_FIELDS,
     DatasetValidationError,
     ModelUnavailableError,
+    REVIEW_TRACE_FIELDS,
     load_accepted_dataset,
     load_artifact,
     predict_message,
@@ -55,6 +56,31 @@ def test_loader_excludes_ambiguous_unreviewed_and_rejected_rows(tmp_path: Path) 
     assert len(dataset.rows) == 16
     assert set(dataset.labels) == {"SCAM", "LEGITIMATE"}
     assert all(row["review_status"] == "accepted" for row in dataset.rows)
+
+
+def test_release_loader_requires_traceable_review_acceptance(tmp_path: Path) -> None:
+    path = tmp_path / "canonical.csv"
+    rows = accepted_rows()
+    with path.open("w", newline="", encoding="utf-8") as file:
+        writer = csv.DictWriter(file, fieldnames=sorted(CANONICAL_FIELDS | REVIEW_TRACE_FIELDS))
+        writer.writeheader()
+        for row in rows:
+            row.update({
+                "review_decision": "accepted",
+                "reviewer_id": "reviewer-a",
+                "reviewed_at": "2026-11-24T10:00:00+05:30",
+            })
+            writer.writerow(row)
+
+    dataset = load_accepted_dataset([path], require_review_traceability=True)
+
+    assert len(dataset.rows) == 16
+    assert all(row["reviewer_id"] == "reviewer-a" for row in dataset.rows)
+
+    untraced_path = tmp_path / "untraced.csv"
+    write_dataset(untraced_path, accepted_rows())
+    with pytest.raises(DatasetValidationError, match="traceability"):
+        load_accepted_dataset([untraced_path], require_review_traceability=True)
 
 
 def test_group_splits_keep_template_families_separate(tmp_path: Path) -> None:
