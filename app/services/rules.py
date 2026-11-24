@@ -70,13 +70,29 @@ def _credential_request_match(text: str) -> str | None:
     A statement such as ``Never share your OTP`` is a benign warning. The same
     statement must not suppress a later explicit request in the message, so each
     candidate is evaluated using only the words immediately before that request.
+
+    Two patterns are checked:
+    1. Action-verb-first: "share/enter/submit/send ... OTP/PIN/password"
+    2. Credential-verb: "verify/confirm/validate ... OTP/PIN/password" — a common
+       phishing form that positions the credential as the object of an action.
     """
 
-    pattern = re.compile(
+    # Pattern 1: explicit disclosure verb followed by credential noun
+    pattern1 = re.compile(
         r"\b(?:share|provide|send|reply\s+with|tell\s+us|enter|submit|disclose)\b[^.!?\n]{0,80}\b(?:otp|upi\s*pin|pin|password|cvv|recovery\s+code)\b",
         re.IGNORECASE,
     )
-    return _first_actionable_match(pattern.pattern, text)
+    match1 = _first_actionable_match(pattern1.pattern, text)
+    if match1:
+        return match1
+
+    # Pattern 2: "verify/confirm/validate your OTP/PIN/password" — phishing phrasing
+    # where the credential appears as the object of a verification verb.
+    pattern2 = re.compile(
+        r"\b(?:verify|confirm|validate|authenticate|authenticate\s+with|authenticate\s+using)\b[^.!?\n]{0,60}\b(?:otp|upi\s*pin|pin|password|cvv|recovery\s+code)\b",
+        re.IGNORECASE,
+    )
+    return _first_actionable_match(pattern2.pattern, text)
 
 
 def analyze_message_rules(message: str) -> list[EvidenceSignal]:

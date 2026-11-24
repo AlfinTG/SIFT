@@ -14,7 +14,7 @@
 | `evidence_quotes` | list/string | no | Exact substrings supporting the assigned label |
 | `rationale` | string | yes | Short explanation for the label |
 | `difficulty` | enum | no | `easy`, `hard_negative`, `ambiguous`, `edge_case` |
-| `source` | string | yes | `adaption_synthetic`, `public_dataset`, or `manual_fixture` |
+| `source` | string | yes | Provenance such as `invented`, `adaption_synthetic`, `public_dataset`, or `manual_fixture` |
 | `source_batch` | string | yes | Batch identifier |
 | `generation_prompt_version` | string | no | Prompt version for synthetic data |
 | `template_family` | string | no | Group identifier for template/near-duplicate splitting |

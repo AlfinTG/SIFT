@@ -13,6 +13,11 @@ The project currently includes a local, rules-only analysis slice:
 
 The ML classifier is **not installed yet**. The app explicitly labels this as a rules-only fallback rather than presenting a model result.
 
+The latest dataset execution found that all eligible candidates still require
+attributable human review, so training remains intentionally blocked. See the
+[ML execution report](docs/ML_EXECUTION_REPORT.md) for the audited counts,
+review package, integration verification, and next gate.
+
 ## Local setup
 
 Use Python 3.11 or newer. From PowerShell in this directory:
@@ -46,13 +51,13 @@ These limits support long pasted messages while preventing unbounded local proce
 
 ## Dataset conversion (offline)
 
-When the `sift-pilot-v2-scam-40` Adaption export is ready, preserve the untouched JSONL under `ml/data/raw/` and convert it locally:
+When an Adaption export is ready, preserve the untouched JSONL or CSV under `ml/data/raw/` and convert it locally:
 
 ```powershell
 python -m ml.prepare_dataset ml/data/raw/sift-pilot-v2-scam-40.jsonl --output-directory ml/data/processed/sift-pilot-v2-scam-40 --source-batch sift-pilot-v2-scam-40 --generation-prompt-version sift-pilot-v2
 ```
 
-The converter expects JSONL objects containing an `enhanced_prompt`, `prompt`, or `original_prompt` string with the required message delimiters, plus a `completion`, `output`, or `response` JSON object/string. It extracts only the message, validates completion JSON and exact evidence quotes, separates `AMBIGUOUS` rows, records rejected rows with a reason, and rejects exact duplicate messages. Every converted row remains `unreviewed`.
+The converter accepts JSONL objects or Adaption CSV rows. Both formats require an `enhanced_prompt`, `prompt`, or `original_prompt` string with the required message delimiters plus an `enhanced_completion`, `completion`, `output`, or `response` JSON object/string; a strictly fenced JSON completion is also accepted. It extracts only the message, validates completion JSON and exact evidence quotes, separates `AMBIGUOUS` rows, records rejected rows with a reason, and rejects exact duplicate messages. Every converted row remains `unreviewed`.
 
 Create the review report and an editable ledger:
 

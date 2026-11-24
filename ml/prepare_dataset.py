@@ -41,8 +41,9 @@ VALID_LABELS = {"SCAM", "LEGITIMATE", "AMBIGUOUS"}
 VALID_SCAM_TYPES = {"fake_job", "phishing_kyc", "upi_payment", "reward_lottery", "other", "none", ""}
 VALID_LANGUAGES = {"en", "hi", "hinglish", "mixed"}
 VALID_DIFFICULTIES = {"easy", "hard_negative", "ambiguous", "edge_case", ""}
-RESERVED_URL_HOSTS = {"example.com"}
-MESSAGE_BLOCK = re.compile(r"MESSAGE_TO_CLASSIFY_BEGIN\s*\n(.*?)\n\s*MESSAGE_TO_CLASSIFY_END", re.DOTALL)
+RESERVED_URL_HOSTS = {"example.com", "example.org", "example.net"}
+MESSAGE_BLOCK = re.compile(r"MESSAGE_TO_CLASSIFY_BEGIN\s*(.*?)\s*MESSAGE_TO_CLASSIFY_END", re.DOTALL)
+JSON_FENCE = re.compile(r"\A\s*```(?:json)?\s*\n?(.*?)\n?\s*```\s*\Z", re.DOTALL | re.IGNORECASE)
 URL_PATTERN = re.compile(r"(?:https?://|www\.)[^\s<>\"']+", re.IGNORECASE)
 PHONE_PATTERN = re.compile(r"(?<!\d)(?:\+?91[\s-]?)?[6-9]\d{9}(?!\d)")
 UPI_PATTERN = re.compile(r"\b[\w.-]{2,}@[\w.-]{2,}\b", re.IGNORECASE)
@@ -71,11 +72,14 @@ def _prompt_from(raw: dict[str, Any]) -> str:
 
 
 def _completion_from(raw: dict[str, Any]) -> dict[str, Any]:
-    for key in ("completion", "output", "response"):
+    for key in ("enhanced_completion", "completion", "output", "response"):
         value = raw.get(key)
         if isinstance(value, dict):
             return value
         if isinstance(value, str):
+            fenced = JSON_FENCE.match(value)
+            if fenced:
+                value = fenced.group(1)
             try:
                 parsed = json.loads(value)
             except json.JSONDecodeError as error:
@@ -142,11 +146,17 @@ def _validate_synthetic_safety(message: str) -> None:
         raise ValueError("message contains a possible credential or OTP value")
 
 
-def canonicalize_row(raw: dict[str, Any], *, source_batch: str, generation_prompt_version: str) -> dict[str, str]:
+def canonicalize_row(
+    raw: dict[str, Any], *, source_batch: str, generation_prompt_version: str, source: str = "adaption_synthetic"
+) -> dict[str, str]:
     """Validate and convert one instruction-data row to the canonical schema."""
 
     message = _extract_message(_prompt_from(raw))
     completion = _completion_from(raw)
+    completion_message = completion.get("message_text")
+    if completion_message is not None:
+        if not isinstance(completion_message, str) or completion_message.strip() != message:
+            raise ValueError("completion message_text does not exactly match the delimited prompt message")
     label = _required_string(completion, "label").upper()
     if label not in VALID_LABELS:
         raise ValueError(f"label must be one of {sorted(VALID_LABELS)}")
@@ -188,7 +198,7 @@ def canonicalize_row(raw: dict[str, Any], *, source_batch: str, generation_promp
         "evidence_quotes": _as_json_string(evidence_quotes),
         "rationale": _required_string(completion, "rationale"),
         "difficulty": difficulty,
-        "source": "adaption_synthetic",
+        "source": source,
         "source_batch": source_batch,
         "generation_prompt_version": generation_prompt_version,
         "template_family": _optional_string(completion, "template_family"),
@@ -210,30 +220,44 @@ def convert_jsonl(
     *,
     source_batch: str,
     generation_prompt_version: str = "",
+    source: str = "adaption_synthetic",
 ) -> ConversionSummary:
-    """Convert a JSONL export, preserving invalid rows in a rejection report."""
+    """Convert a JSONL or Adaption CSV export, preserving invalid rows in a rejection report."""
 
     accepted: list[dict[str, str]] = []
     ambiguous: list[dict[str, str]] = []
     rejected: list[dict[str, str]] = []
     seen_messages: set[str] = set()
 
-    with raw_path.open(encoding="utf-8") as file:
-        for row_number, line in enumerate(file, start=1):
-            if not line.strip():
-                continue
+    with raw_path.open(newline="", encoding="utf-8") as file:
+        is_csv = raw_path.suffix.lower() == ".csv"
+        if is_csv:
+            records = ((row_number, row, _as_json_string(row)) for row_number, row in enumerate(csv.DictReader(file), start=2))
+        else:
+            def jsonl_records() -> Any:
+                for row_number, line in enumerate(file, start=1):
+                    if line.strip():
+                        yield row_number, line, line.rstrip("\n")
+            records = jsonl_records()
+        for row_number, raw, raw_row in records:
             try:
-                raw = json.loads(line)
+                if not is_csv:
+                    raw = json.loads(raw)
                 if not isinstance(raw, dict):
                     raise ValueError("JSONL row must be an object")
-                row = canonicalize_row(raw, source_batch=source_batch, generation_prompt_version=generation_prompt_version)
+                row = canonicalize_row(
+                    raw,
+                    source_batch=source_batch,
+                    generation_prompt_version=generation_prompt_version,
+                    source=source,
+                )
                 duplicate_key = " ".join(row["message_text"].casefold().split())
                 if duplicate_key in seen_messages:
                     raise ValueError("duplicate message_text in this conversion run")
                 seen_messages.add(duplicate_key)
                 (ambiguous if row["label"] == "AMBIGUOUS" else accepted).append(row)
             except (json.JSONDecodeError, ValueError) as error:
-                rejected.append({"row_number": str(row_number), "reason": str(error), "raw_row": line.rstrip("\n")})
+                rejected.append({"row_number": str(row_number), "reason": str(error), "raw_row": raw_row})
 
     _write_csv(output_directory / "accepted.csv", CANONICAL_FIELDS, accepted)
     _write_csv(output_directory / "ambiguous.csv", CANONICAL_FIELDS, ambiguous)
@@ -243,11 +267,12 @@ def convert_jsonl(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Convert a SIFT Adaption instruction-data JSONL export.")
-    parser.add_argument("raw_path", type=Path, help="Immutable JSONL export from the dataset provider")
+    parser = argparse.ArgumentParser(description="Convert a SIFT Adaption instruction-data JSONL or CSV export.")
+    parser.add_argument("raw_path", type=Path, help="Immutable JSONL or CSV export from the dataset provider")
     parser.add_argument("--output-directory", type=Path, required=True, help="Directory for derived CSV files")
     parser.add_argument("--source-batch", required=True, help="Stable identifier for this generation batch")
     parser.add_argument("--generation-prompt-version", default="", help="Prompt version recorded with every converted row")
+    parser.add_argument("--source", default="adaption_synthetic", help="Provenance value recorded with every converted row")
     arguments = parser.parse_args()
 
     summary = convert_jsonl(
@@ -255,6 +280,7 @@ def main() -> None:
         arguments.output_directory,
         source_batch=arguments.source_batch,
         generation_prompt_version=arguments.generation_prompt_version,
+        source=arguments.source,
     )
     print(json.dumps(summary.__dict__, indent=2))
 

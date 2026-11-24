@@ -17,7 +17,7 @@ def row(sample_id: str, *, label: str = "SCAM", family: str = "fake_job", text: 
         "scam_type": family if label == "SCAM" else "",
         "difficulty": "easy" if label == "SCAM" else "hard_negative",
         "template_family": prefix + "01",
-        "source_batch": "sift-pilot-v2-scam-40" if label == "SCAM" else f"sift-pilot-v2-{label.lower()}",
+        "source_batch": "sift-pilot-v2-scam-40" if label == "SCAM" else f"sift-pilot-v2-{label.lower()}-40",
         "review_status": status,
         "language": language,
     }
@@ -34,6 +34,7 @@ def test_manifest_has_controlled_family_and_language_targets() -> None:
     assert manifest["language_targets"]["SCAM"] == {"en": 16, "hi": 8, "hinglish": 12, "mixed": 4}
     assert manifest["language_targets"]["LEGITIMATE"] == {"en": 16, "hi": 8, "hinglish": 12, "mixed": 4}
     assert manifest["language_targets"]["AMBIGUOUS"] == {"en": 6, "hi": 4, "hinglish": 4, "mixed": 2}
+    assert {item["source_batch"] for item in manifest["strata"] if item["label"] == "LEGITIMATE"} == {"sift-pilot-v2-legitimate-40"}
 
 
 def test_review_reports_cross_batch_duplicate_and_ledger_reason() -> None:

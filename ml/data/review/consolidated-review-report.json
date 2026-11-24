@@ -1,0 +1,711 @@
+{
+  "row_count": 35,
+  "manifest_findings": [
+    {
+      "sample_id": "sift-eb9a4222d7f0a1ff",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-f1beaaa6285e6d3c",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-67b7730cb5bb6dd6",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-4759fac73dceb84f",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-2f8ca91de5f39b5e",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-0b8116138e602ade",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-b6a31065cf98ea94",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-9a0541a55f1bd7bf",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-85cfc61fe546eded",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-f73552c902b59781",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-c5c662ec08d6ca86",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-4394838d7b351507",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-9b021d1c408f31e2",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-4027c6f7de6a43eb",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-4ad3aa5c37cca168",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-ee87cf567638074e",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-df1d7c91600baf4f",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-75d5f96b68fb0e14",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-3b11a4a27c3110e6",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-d50a9365b85081f6",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-50c6fc02650818d3",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-ed0bd4f66c2c0575",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-a4c6de49283ff819",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-f93442934ec70d0f",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-d7269ae1e0df403d",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-6e9b5ecbbee34bbe",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-ab7060712d15c2f6",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-879148aa33fda8fd",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-176fe2f214d629cf",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-b7233437df5ea932",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-949c0dfff45e9cd0",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-5642a873fdc1d0a0",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-8ab62abebd84445e",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-6957d1d35a13d81f",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-8a8613b62abcd0a5",
+      "reason": "row does not match exactly one manifest stratum"
+    }
+  ],
+  "exact_duplicate_findings": [],
+  "near_duplicate_candidates": [],
+  "review_status_findings": [],
+  "review_ledger": [
+    {
+      "sample_id": "sift-eb9a4222d7f0a1ff",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-f1beaaa6285e6d3c",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-67b7730cb5bb6dd6",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-4759fac73dceb84f",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-2f8ca91de5f39b5e",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-0b8116138e602ade",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-b6a31065cf98ea94",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-9a0541a55f1bd7bf",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-85cfc61fe546eded",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-f73552c902b59781",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-c5c662ec08d6ca86",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-4394838d7b351507",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-9b021d1c408f31e2",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-4027c6f7de6a43eb",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-4ad3aa5c37cca168",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-ee87cf567638074e",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-df1d7c91600baf4f",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-75d5f96b68fb0e14",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-3b11a4a27c3110e6",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-d50a9365b85081f6",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-50c6fc02650818d3",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-ed0bd4f66c2c0575",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-a4c6de49283ff819",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-f93442934ec70d0f",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-d7269ae1e0df403d",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-6e9b5ecbbee34bbe",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-ab7060712d15c2f6",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-879148aa33fda8fd",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-176fe2f214d629cf",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-b7233437df5ea932",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-949c0dfff45e9cd0",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-5642a873fdc1d0a0",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-8ab62abebd84445e",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-6957d1d35a13d81f",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-8a8613b62abcd0a5",
+      "review_status": "needs_review",
+      "review_decision": "needs_review",
+      "reviewer_id": "",
+      "reviewed_at": "",
+      "review_notes": "",
+      "rejection_reason": "row does not match exactly one manifest stratum"
+    }
+  ],
+  "quota_report": [
+    {
+      "stratum_id": "scam-fake_job",
+      "target_count": 8,
+      "accepted_count": 0,
+      "remaining": 8,
+      "overflow": 0,
+      "unreviewed_count": 0,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "stratum_id": "scam-phishing_kyc",
+      "target_count": 8,
+      "accepted_count": 0,
+      "remaining": 8,
+      "overflow": 0,
+      "unreviewed_count": 0,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "stratum_id": "scam-upi_payment",
+      "target_count": 8,
+      "accepted_count": 0,
+      "remaining": 8,
+      "overflow": 0,
+      "unreviewed_count": 0,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "stratum_id": "scam-reward_lottery",
+      "target_count": 8,
+      "accepted_count": 0,
+      "remaining": 8,
+      "overflow": 0,
+      "unreviewed_count": 0,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "stratum_id": "scam-other",
+      "target_count": 8,
+      "accepted_count": 0,
+      "remaining": 8,
+      "overflow": 0,
+      "unreviewed_count": 0,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "stratum_id": "legitimate-employment_recruitment",
+      "target_count": 8,
+      "accepted_count": 0,
+      "remaining": 8,
+      "overflow": 0,
+      "unreviewed_count": 0,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "stratum_id": "legitimate-banking_otp_kyc_safety",
+      "target_count": 8,
+      "accepted_count": 0,
+      "remaining": 8,
+      "overflow": 0,
+      "unreviewed_count": 0,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "stratum_id": "legitimate-payments_refunds_upi",
+      "target_count": 8,
+      "accepted_count": 0,
+      "remaining": 8,
+      "overflow": 0,
+      "unreviewed_count": 0,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "stratum_id": "legitimate-delivery_rewards_promotions",
+      "target_count": 8,
+      "accepted_count": 0,
+      "remaining": 8,
+      "overflow": 0,
+      "unreviewed_count": 0,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "stratum_id": "legitimate-miscellaneous",
+      "target_count": 8,
+      "accepted_count": 0,
+      "remaining": 8,
+      "overflow": 0,
+      "unreviewed_count": 0,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "stratum_id": "ambiguous-review",
+      "target_count": 16,
+      "accepted_count": 0,
+      "remaining": 16,
+      "overflow": 0,
+      "unreviewed_count": 0,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    }
+  ],
+  "language_quota_report": [
+    {
+      "label": "SCAM",
+      "language": "en",
+      "target_count": 16,
+      "accepted_count": 0,
+      "remaining": 16,
+      "overflow": 0,
+      "unreviewed_count": 4,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "label": "SCAM",
+      "language": "hi",
+      "target_count": 8,
+      "accepted_count": 0,
+      "remaining": 8,
+      "overflow": 0,
+      "unreviewed_count": 0,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "label": "SCAM",
+      "language": "hinglish",
+      "target_count": 12,
+      "accepted_count": 0,
+      "remaining": 12,
+      "overflow": 0,
+      "unreviewed_count": 1,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "label": "SCAM",
+      "language": "mixed",
+      "target_count": 4,
+      "accepted_count": 0,
+      "remaining": 4,
+      "overflow": 0,
+      "unreviewed_count": 0,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "label": "LEGITIMATE",
+      "language": "en",
+      "target_count": 16,
+      "accepted_count": 0,
+      "remaining": 16,
+      "overflow": 0,
+      "unreviewed_count": 30,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "label": "LEGITIMATE",
+      "language": "hi",
+      "target_count": 8,
+      "accepted_count": 0,
+      "remaining": 8,
+      "overflow": 0,
+      "unreviewed_count": 0,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "label": "LEGITIMATE",
+      "language": "hinglish",
+      "target_count": 12,
+      "accepted_count": 0,
+      "remaining": 12,
+      "overflow": 0,
+      "unreviewed_count": 0,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "label": "LEGITIMATE",
+      "language": "mixed",
+      "target_count": 4,
+      "accepted_count": 0,
+      "remaining": 4,
+      "overflow": 0,
+      "unreviewed_count": 0,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "label": "AMBIGUOUS",
+      "language": "en",
+      "target_count": 6,
+      "accepted_count": 0,
+      "remaining": 6,
+      "overflow": 0,
+      "unreviewed_count": 0,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "label": "AMBIGUOUS",
+      "language": "hi",
+      "target_count": 4,
+      "accepted_count": 0,
+      "remaining": 4,
+      "overflow": 0,
+      "unreviewed_count": 0,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "label": "AMBIGUOUS",
+      "language": "hinglish",
+      "target_count": 4,
+      "accepted_count": 0,
+      "remaining": 4,
+      "overflow": 0,
+      "unreviewed_count": 0,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    },
+    {
+      "label": "AMBIGUOUS",
+      "language": "mixed",
+      "target_count": 2,
+      "accepted_count": 0,
+      "remaining": 2,
+      "overflow": 0,
+      "unreviewed_count": 0,
+      "needs_review_count": 0,
+      "rejected_count": 0
+    }
+  ]
+}

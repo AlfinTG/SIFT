@@ -7,6 +7,7 @@
   const analyzeButton = document.querySelector("#analyze");
   const analyzeBtnText = document.querySelector("#analyzeBtnText");
   const loadingIndicator = document.querySelector("#loadingIndicator");
+  const charCountDisplay = document.querySelector("#charCountDisplay");
   const formError = document.querySelector("#form-error");
   const formErrorText = document.querySelector("#form-error-text");
   const formErrorClose = document.querySelector("#form-error-close");
@@ -23,12 +24,11 @@
   const evidenceCountBadge = document.querySelector("#evidenceCountBadge");
   const analyzeAnotherBtn = document.querySelector("#analyzeAnotherBtn");
 
-  // Layer 3 (Technical Details) elements
+  // Level 3 (Transparency & Technical details) elements
+  const urlInspections = document.querySelector("#url-inspections");
+  const technicalUrlList = document.querySelector("#technicalUrlList");
   const engineStatusTag = document.querySelector("#engineStatusTag");
   const engineLimitationText = document.querySelector("#engineLimitationText");
-  const mlModelDetails = document.querySelector("#mlModelDetails");
-  const technicalUrlContainer = document.querySelector("#technicalUrlContainer");
-  const technicalUrlList = document.querySelector("#technicalUrlList");
   const technicalLimitationsList = document.querySelector("#technicalLimitationsList");
 
   // User-facing friendly verdict dictionary
@@ -80,12 +80,30 @@
     formErrorClose.addEventListener("click", hideError);
   }
 
-  // Clear workspace
+  // Update live character count
+  function updateCharCount() {
+    const count = unifiedInput ? unifiedInput.value.length : 0;
+    if (charCountDisplay) {
+      charCountDisplay.textContent = `${count.toLocaleString()} / 10,000 characters`;
+      if (count > 9500) {
+        charCountDisplay.classList.add("text-[#BA1A1A]");
+      } else {
+        charCountDisplay.classList.remove("text-[#BA1A1A]");
+      }
+    }
+  }
+
+  if (unifiedInput) {
+    unifiedInput.addEventListener("input", updateCharCount);
+  }
+
+  // Reset workspace
   function resetWorkspace() {
     if (unifiedInput) unifiedInput.value = "";
     if (hiddenMessage) hiddenMessage.value = "";
     if (hiddenUrl) hiddenUrl.value = "";
     if (incidentStatus) incidentStatus.value = "received_only";
+    updateCharCount();
     hideError();
     if (results) results.hidden = true;
     if (unifiedInput) unifiedInput.focus();
@@ -109,6 +127,7 @@
         const text = await navigator.clipboard.readText();
         if (text && unifiedInput) {
           unifiedInput.value = text;
+          updateCharCount();
           hideError();
           unifiedInput.focus();
         }
@@ -146,6 +165,7 @@
         if (sc && unifiedInput) {
           unifiedInput.value = sc.text;
           if (incidentStatus) incidentStatus.value = sc.incident;
+          updateCharCount();
           hideError();
           runAnalysis();
         }
@@ -160,24 +180,24 @@
     }
   });
 
-  // Render Layer 1: Immediate Decision
+  // Render Level 1: Immediate Decision
   function renderLayer1(data) {
     layer1Decision.replaceChildren();
     const levelKey = data.assessment.level;
     const verdictInfo = VERDICT_MAP[levelKey] || VERDICT_MAP.low_indicators;
 
-    layer1Decision.className = `rounded-2xl p-6 sm:p-7 shadow-sm transition-all duration-300 verdict-${levelKey}`;
+    layer1Decision.className = `rounded-2xl p-6 sm:p-8 shadow-sm transition-all duration-300 verdict-${levelKey}`;
 
-    // Top Header: Badge + Title
+    // Top Header: Badge + Assessment Scope
     const headerRow = createEl("div", "flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#202622]/10");
     const badgeWrapper = createEl("div", "flex items-center gap-2");
     const badge = createEl("span", `inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wide verdict-badge`);
-    const icon = createEl("span", "material-symbols-outlined text-[15px]", verdictInfo.icon);
+    const icon = createEl("span", "material-symbols-outlined text-[16px]", verdictInfo.icon);
     const badgeLabel = createEl("span", "", verdictInfo.label.toUpperCase());
     badge.append(icon, badgeLabel);
     badgeWrapper.append(badge);
 
-    const safeAuditNote = createEl("span", "text-xs text-[#404944] font-medium", "Scan completed locally");
+    const safeAuditNote = createEl("span", "text-xs text-[#404944] font-medium font-mono", "Local Sandbox Verified");
     headerRow.append(badgeWrapper, safeAuditNote);
 
     // One-sentence summary explanation
@@ -188,23 +208,23 @@
     if (data.assessment.uncertain) {
       const cautionText = createEl("p", "text-xs text-[#546500] font-medium flex items-center gap-1 mt-1");
       const cautionIcon = createEl("span", "material-symbols-outlined text-[15px]", "info");
-      const cautionMsg = createEl("span", "", "Note: SIFT highlights patterns based on rules. A clear result never guarantees a message is completely safe. Always verify independently.");
+      const cautionMsg = createEl("span", "", "Important Notice: SIFT flags patterns based on local rules. A clear result never guarantees that a message or link is completely safe. Always independently verify.");
       cautionText.append(cautionIcon, cautionMsg);
       summaryRow.append(cautionText);
     }
 
-    // Recommended Actions section right in Layer 1
-    const actionsSection = createEl("div", "mt-5 pt-4 border-t border-[#202622]/10 flex flex-col gap-2.5");
+    // Recommended Actions section right in Level 1
+    const actionsSection = createEl("div", "mt-6 pt-4 border-t border-[#202622]/10 flex flex-col gap-3");
     const actionsTitle = createEl("h4", "font-bold text-sm text-[#003523] flex items-center gap-1.5");
     const actIcon = createEl("span", "material-symbols-outlined text-[18px] text-[#174C38]", "check_circle");
-    const actTitleText = createEl("span", "", "What you should do:");
+    const actTitleText = createEl("span", "", "Recommended immediate steps:");
     actionsTitle.append(actIcon, actTitleText);
     actionsSection.append(actionsTitle);
 
     if (data.next_steps && data.next_steps.length > 0) {
       const actionsList = createEl("ul", "space-y-2 mt-1");
       data.next_steps.forEach((step, idx) => {
-        const item = createEl("li", "flex items-start gap-2.5 text-sm text-[#202622] leading-relaxed bg-white/70 p-2.5 rounded-xl border border-[#202622]/5");
+        const item = createEl("li", "flex items-start gap-2.5 text-sm text-[#202622] leading-relaxed bg-white/70 p-3 rounded-xl border border-[#202622]/5 shadow-2xs");
         const num = createEl("span", "w-5 h-5 rounded-full bg-[#174C38] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5", String(idx + 1));
         const textSpan = createEl("span", "font-medium", step);
         item.append(num, textSpan);
@@ -216,19 +236,19 @@
     layer1Decision.append(headerRow, summaryRow, actionsSection);
   }
 
-  // Render Layer 2: Evidence Trail ("Why we flagged this")
+  // Render Level 2: Evidence Trail ("Why SIFT Flagged This")
   function renderLayer2(signals) {
     evidenceList.replaceChildren();
     const count = signals ? signals.length : 0;
     if (evidenceCountBadge) {
-      evidenceCountBadge.textContent = `${count} ${count === 1 ? "warning sign" : "warning signs"} found`;
+      evidenceCountBadge.textContent = `${count} ${count === 1 ? "signal" : "signals"} detected`;
     }
 
     if (count === 0) {
-      const emptyCard = createEl("div", "p-5 rounded-xl bg-white border border-[#DDD7C5] text-center flex flex-col items-center gap-1.5");
-      const icon = createEl("span", "material-symbols-outlined text-2xl text-[#174C38]", "check");
-      const title = createEl("h4", "font-bold text-sm text-[#003523]", "No specific scam patterns detected");
-      const msg = createEl("p", "text-xs text-[#404944] max-w-md", "SIFT did not find common fraud keywords, payment traps, or known deceptive link patterns in this text.");
+      const emptyCard = createEl("div", "p-6 rounded-2xl bg-white border border-[#DDD7C5] text-center flex flex-col items-center gap-2 shadow-xs");
+      const icon = createEl("span", "material-symbols-outlined text-3xl text-[#174C38]", "check_circle");
+      const title = createEl("h4", "font-bold text-base text-[#003523]", "No specific scam patterns detected");
+      const msg = createEl("p", "text-xs text-[#404944] max-w-md leading-relaxed", "SIFT's rule engine did not find explicit indicators of upfront fee demands, credential coercion, urgency, or suspicious URL structures in this message.");
       emptyCard.append(icon, title, msg);
       evidenceList.append(emptyCard);
       return;
@@ -236,21 +256,27 @@
 
     signals.forEach((sig) => {
       // Clean, vertical one-per-row card
-      const card = createEl("div", "p-4 sm:p-5 rounded-xl bg-white border border-[#DDD7C5] shadow-xs flex flex-col gap-2.5");
+      const card = createEl("div", "p-5 rounded-2xl bg-white border border-[#DDD7C5] shadow-xs flex flex-col gap-3");
 
-      // What was noticed (Title)
+      // What was noticed (Title & Severity)
       const topRow = createEl("div", "flex items-start justify-between gap-2");
       const titleWrap = createEl("div", "flex items-center gap-2");
       const flagIcon = createEl("span", "material-symbols-outlined text-[18px] text-[#B45309] shrink-0", "flag");
       const title = createEl("h4", "text-sm font-bold text-[#003523]", sig.reason || sig.signal_id.replace(/_/g, " "));
       titleWrap.append(flagIcon, title);
-      topRow.append(titleWrap);
+
+      let sevClass = "bg-[#D4EE66] text-[#181E00]";
+      if (sig.severity === "high" || sig.severity === "critical") {
+        sevClass = "bg-[#FFDAD6] text-[#93000A]";
+      }
+      const sevBadge = createEl("span", `px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${sevClass}`, sig.severity);
+      topRow.append(titleWrap, sevBadge);
       card.append(topRow);
 
       // What part triggered it (Exact snippet)
       if (sig.evidence) {
-        const snippetBox = createEl("div", "p-2.5 rounded-lg bg-[#FAF8F2] border border-[#EAEDE6] flex flex-col gap-1");
-        const snippetLabel = createEl("span", "text-[10px] font-bold uppercase tracking-wider text-[#707973]", "Flagged text in message:");
+        const snippetBox = createEl("div", "p-3 rounded-xl bg-[#FAF8F2] border border-[#EAEDE6] flex flex-col gap-1");
+        const snippetLabel = createEl("span", "text-[10px] font-bold uppercase tracking-wider text-[#707973] font-mono", "Flagged phrase in message:");
         const snippetText = createEl("p", "text-xs font-semibold text-[#BA1A1A] break-words font-mono", `"${sig.evidence}"`);
         snippetBox.append(snippetLabel, snippetText);
         card.append(snippetBox);
@@ -258,8 +284,8 @@
 
       // Actionable safety takeaway
       if (sig.recommended_action) {
-        const actionRow = createEl("div", "text-xs text-[#404944] flex items-start gap-1.5");
-        const checkIcon = createEl("span", "material-symbols-outlined text-[15px] text-[#174C38] shrink-0 mt-0.5", "arrow_right");
+        const actionRow = createEl("div", "text-xs text-[#404944] flex items-start gap-2 bg-[#EFF5EE] p-2.5 rounded-lg border border-[#DDD7C5]/50");
+        const checkIcon = createEl("span", "material-symbols-outlined text-[16px] text-[#174C38] shrink-0 mt-0.5", "arrow_right");
         const actionText = createEl("span", "font-medium text-[#202622]", sig.recommended_action);
         actionRow.append(checkIcon, actionText);
         card.append(actionRow);
@@ -269,49 +295,55 @@
     });
   }
 
-  // Render Layer 3: Technical Details (collapsed)
+  // Render Level 3: Transparency, URL Structural Inspection & Limitations
   function renderLayer3(data) {
     if (engineStatusTag) {
-      engineStatusTag.textContent = data.model && data.model.status ? data.model.status.toUpperCase() : "RULES-ONLY FALLBACK";
+      const isAvailable = data.model && (data.model.status === "available" || data.model.available);
+      const status = data.model && data.model.status ? data.model.status.toUpperCase() : "ACTIVE";
+      engineStatusTag.textContent = isAvailable ? "ML ACTIVE" : "RULES-ONLY FALLBACK";
     }
     if (engineLimitationText) {
-      engineLimitationText.textContent = data.model?.limitation || "The local rule engine evaluated this content without remote ML model dependencies.";
-    }
-    if (mlModelDetails) {
-      mlModelDetails.replaceChildren();
-      const model = data.model || {};
-      if (model.available && model.prediction && typeof model.score === "number") {
-        const title = createEl("p", "font-bold text-[#003523]", `Local model signal: ${model.prediction}`);
-        const detail = createEl("p", "mt-1", `Model score: ${model.score.toFixed(2)}. This is an uncalibrated model score, not a probability or proof.`);
-        mlModelDetails.append(title, detail);
-        mlModelDetails.classList.remove("hidden");
-      } else {
-        mlModelDetails.classList.add("hidden");
+      let desc = data.model?.limitation || "The local rule engine evaluated this content without remote ML model dependencies.";
+      if (data.model && (data.model.status === "available" || data.model.available)) {
+        desc += " The score is an indicative heuristic signal, not a probability or proof of scam activity.";
       }
+      engineLimitationText.textContent = desc;
     }
 
-    // URL parsing breakdown
-    if (technicalUrlList) {
+    // URL structural inspection presentation
+    const urls = data.urls || [];
+    if (technicalUrlList && urlInspections) {
       technicalUrlList.replaceChildren();
-      if (!data.urls || data.urls.length === 0) {
-        const noUrls = createEl("p", "text-xs text-[#707973] italic", "No HTTP/HTTPS web addresses were detected in the text.");
-        technicalUrlList.append(noUrls);
+      if (urls.length === 0) {
+        urlInspections.classList.add("hidden");
       } else {
-        data.urls.forEach((u) => {
-          const item = createEl("div", "p-2.5 rounded bg-white border border-[#DDD7C5] flex flex-col gap-1");
+        urlInspections.classList.remove("hidden");
+        urls.forEach((u) => {
+          const item = createEl("div", "p-3 rounded-xl bg-[#FAF8F2] border border-[#DDD7C5] flex flex-col gap-1.5");
+          const topInfo = createEl("div", "flex items-center justify-between flex-wrap gap-2");
           const urlLink = createEl("span", "font-mono text-xs font-bold text-[#003523] break-all", u.submitted_url);
-          const meta = createEl("span", "text-[11px] text-[#404944]", `Host: ${u.host || 'N/A'} · Scheme: ${(u.scheme || '').toUpperCase()} · Valid: ${u.valid ? 'Yes' : 'No'}`);
-          item.append(urlLink, meta);
+          const validBadge = createEl("span", `text-[10px] font-mono px-2 py-0.5 rounded font-bold ${u.valid ? "bg-[#D4EE66] text-[#181E00]" : "bg-[#FFDAD6] text-[#93000A]"}`, u.valid ? "VALID SYNTAX" : "INVALID URL");
+          topInfo.append(urlLink, validBadge);
+          item.append(topInfo);
+
+          if (u.valid) {
+            const meta = createEl("span", "text-[11px] text-[#404944] font-mono", `Host: ${u.host || 'N/A'} • Scheme: ${(u.scheme || '').toUpperCase()}`);
+            item.append(meta);
+          }
           if (u.error) {
-            const err = createEl("span", "text-[11px] text-[#BA1A1A]", u.error);
+            const err = createEl("span", "text-xs text-[#BA1A1A] font-mono font-medium", u.error);
             item.append(err);
+          }
+          if (u.signals && u.signals.length > 0) {
+            const sigNote = createEl("span", "text-xs text-[#B45309] font-medium", `${u.signals.length} structural risk pattern(s) identified on this link.`);
+            item.append(sigNote);
           }
           technicalUrlList.append(item);
         });
       }
     }
 
-    // Limitations list
+    // System limitations list
     if (technicalLimitationsList) {
       technicalLimitationsList.replaceChildren();
       if (data.limitations && data.limitations.length > 0) {
@@ -341,17 +373,17 @@
     const rawInput = unifiedInput ? unifiedInput.value.trim() : "";
 
     if (!rawInput) {
-      showError("Please paste a message or web address to check.");
+      showError("Please paste a message or enter a web link to analyze.");
       if (unifiedInput) unifiedInput.focus();
       return;
     }
 
     if (rawInput.length > 10000) {
-      showError("Your message is too long (limit is 10,000 characters). Please paste a shorter excerpt.");
+      showError("Your message exceeds the 10,000 character limit. Please paste a shorter excerpt.");
       return;
     }
 
-    // Sync hidden fields to satisfy test suites / backend contract
+    // Automatically detect whether the input is a single standalone URL
     const isUrlOnly = /^https?:\/\/[^\s]+$/i.test(rawInput);
     if (isUrlOnly) {
       if (hiddenUrl) hiddenUrl.value = rawInput;
@@ -361,9 +393,9 @@
       if (hiddenUrl) hiddenUrl.value = "";
     }
 
-    // Prepare JSON payload according to API contract
+    // Prepare JSON payload adhering to the API contract
     const payload = {
-      message: isUrlOnly ? "" : rawInput,
+      message: isUrlOnly ? null : rawInput,
       url: isUrlOnly ? rawInput : null,
       include_url_inspection: true,
       incident_status: incidentStatus ? incidentStatus.value : "received_only"
@@ -371,7 +403,7 @@
 
     // UI Loading state
     if (analyzeButton) analyzeButton.disabled = true;
-    if (analyzeBtnText) analyzeBtnText.textContent = "Checking...";
+    if (analyzeBtnText) analyzeBtnText.textContent = "Analyzing Locally...";
     if (loadingIndicator) loadingIndicator.classList.remove("hidden");
 
     try {
@@ -400,7 +432,7 @@
       showError("Cannot connect to the SIFT analysis service. Please check your network or ensure the server is running.");
     } finally {
       if (analyzeButton) analyzeButton.disabled = false;
-      if (analyzeBtnText) analyzeBtnText.textContent = "Check for Scam Signs";
+      if (analyzeBtnText) analyzeBtnText.textContent = "Analyze Message";
       if (loadingIndicator) loadingIndicator.classList.add("hidden");
     }
   }
@@ -408,4 +440,7 @@
   if (analyzeButton) {
     analyzeButton.addEventListener("click", runAnalysis);
   }
+
+  // Initial count update
+  updateCharCount();
 })();

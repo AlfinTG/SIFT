@@ -1,0 +1,234 @@
+{
+  "audit_version": "sift-consolidated-audit-v1",
+  "raw_inventory": [
+    {
+      "path": "ml/data/raw/SIFT sift-pilot-v2 LEGITIMATE 40.csv",
+      "csv_records": 40,
+      "sha256": "463e6b1b4dcc44bd9a601bfb0dcf908f8b546314bd24b8a9710053f4b8db7987"
+    },
+    {
+      "path": "ml/data/raw/SIFT pilot v3 SCAM fake_job structural validation batch.csv",
+      "csv_records": 8,
+      "sha256": "a72497905e263af7c367bf44abecc2aeadb2f2f7ceccd84d57e3f3454c46f8e7"
+    },
+    {
+      "path": "ml/data/raw/SIFT sift-pilot-v2 SCAM 40.csv",
+      "csv_records": 39,
+      "sha256": "1b1788d9062ec4f3eec6e56d0cc3899bf1e1a8484c03ae80d26db3448146bfe0"
+    },
+    {
+      "path": "ml/data/raw/SIFT sift-pilot-v2 SCAM 40_1.csv",
+      "csv_records": 39,
+      "sha256": "1b1788d9062ec4f3eec6e56d0cc3899bf1e1a8484c03ae80d26db3448146bfe0"
+    }
+  ],
+  "eligible_candidate_count": 35,
+  "candidate_distribution": {
+    "labels": {
+      "LEGITIMATE": 30,
+      "SCAM": 5
+    },
+    "languages": {
+      "en": 34,
+      "hinglish": 1
+    },
+    "scam_types": {
+      "fake_job": 5
+    },
+    "review_statuses": {
+      "unreviewed": 35
+    },
+    "source_batches": {
+      "sift-pilot-v2-legitimate-40": 30,
+      "sift-pilot-v3-scam-fake-job": 5
+    }
+  },
+  "schema_missing_fields": [],
+  "evidence_quote_issues": [],
+  "exact_duplicate_findings": [],
+  "near_duplicate_candidates": [],
+  "template_family_duplicates": [
+    {
+      "template_family": "security_alert_protective",
+      "sample_ids": [
+        "sift-df1d7c91600baf4f",
+        "sift-f93442934ec70d0f",
+        "sift-d7269ae1e0df403d",
+        "sift-ab7060712d15c2f6"
+      ]
+    }
+  ],
+  "manifest_findings": [
+    {
+      "sample_id": "sift-eb9a4222d7f0a1ff",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-f1beaaa6285e6d3c",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-67b7730cb5bb6dd6",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-4759fac73dceb84f",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-2f8ca91de5f39b5e",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-0b8116138e602ade",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-b6a31065cf98ea94",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-9a0541a55f1bd7bf",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-85cfc61fe546eded",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-f73552c902b59781",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-c5c662ec08d6ca86",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-4394838d7b351507",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-9b021d1c408f31e2",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-4027c6f7de6a43eb",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-4ad3aa5c37cca168",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-ee87cf567638074e",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-df1d7c91600baf4f",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-75d5f96b68fb0e14",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-3b11a4a27c3110e6",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-d50a9365b85081f6",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-50c6fc02650818d3",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-ed0bd4f66c2c0575",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-a4c6de49283ff819",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-f93442934ec70d0f",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-d7269ae1e0df403d",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-6e9b5ecbbee34bbe",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-ab7060712d15c2f6",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-879148aa33fda8fd",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-176fe2f214d629cf",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-b7233437df5ea932",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-949c0dfff45e9cd0",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-5642a873fdc1d0a0",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-8ab62abebd84445e",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-6957d1d35a13d81f",
+      "reason": "row does not match exactly one manifest stratum"
+    },
+    {
+      "sample_id": "sift-8a8613b62abcd0a5",
+      "reason": "row does not match exactly one manifest stratum"
+    }
+  ],
+  "possible_brand_or_impersonation_review": [
+    {
+      "sample_id": "sift-949c0dfff45e9cd0",
+      "possible_named_entity": "Apex Digital"
+    },
+    {
+      "sample_id": "sift-5642a873fdc1d0a0",
+      "possible_named_entity": "HR Manager"
+    },
+    {
+      "sample_id": "sift-8ab62abebd84445e",
+      "possible_named_entity": "Urgent Hiring"
+    },
+    {
+      "sample_id": "sift-6957d1d35a13d81f",
+      "possible_named_entity": "Global Tech Solutions"
+    },
+    {
+      "sample_id": "sift-8a8613b62abcd0a5",
+      "possible_named_entity": "Global Tech Solutions"
+    }
+  ],
+  "training_gate": {
+    "passed": false,
+    "reason": "No eligible candidate has a completed accepted review decision with reviewer identity and timestamp."
+  },
+  "limitations": [
+    "Automated structural validation cannot establish message truthfulness or approve a sample.",
+    "The supplied candidates are synthetic and are not a real-world benchmark.",
+    "The v2 manifest does not define strata for the v3 fake-job batch or the existing legitimate template families."
+  ]
+}

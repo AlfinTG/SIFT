@@ -1,14 +1,14 @@
 :root {
   color-scheme: light;
-  --forest: #174c38;
-  --primary-dark: #003523;
-  --cream: #f7f3e8;
-  --lime: #d8f36a;
-  --charcoal: #202622;
-  --muted: #404944;
-  --line: #ddd7c5;
-  --surface-low: #eff5ee;
-  --surface-lowest: #ffffff;
+  --primary-deep: #003523;
+  --primary-forest: #174c38;
+  --accent-lime: #d8f36a;
+  --bg-cream: #f7f3e8;
+  --text-carbon: #202622;
+  --text-muted: #404944;
+  --line-border: #ddd7c5;
+  --surface-white: #ffffff;
+  --surface-parchment: #eff5ee;
 }
 
 * {
@@ -18,8 +18,8 @@
 body {
   margin: 0;
   min-width: 320px;
-  background-color: var(--cream);
-  color: var(--charcoal);
+  background-color: var(--bg-cream);
+  color: var(--text-carbon);
   font-family: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -30,7 +30,7 @@ body {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--surface-low);
+  background: var(--surface-parchment);
 }
 ::-webkit-scrollbar-thumb {
   background: #c0c9c2;
@@ -40,7 +40,7 @@ body {
   background: #a2aba5;
 }
 
-/* Layer 1 Result Card Variants */
+/* Level 1 Verdict Card Styling (Calm, Editorial & Non-Alarmist) */
 .verdict-critical {
   background-color: #fdf2f2;
   border: 1.5px solid #f8b4b4;
@@ -81,7 +81,21 @@ body {
   color: #ffffff;
 }
 
-/* Interactive transitions */
-button, a, input, textarea, select, details summary {
+/* Microinteractions and Smooth Transitions */
+button, a, input, textarea, select {
   transition: all 0.15s ease-in-out;
+}
+
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 2px solid var(--primary-forest);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

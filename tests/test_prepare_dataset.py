@@ -113,3 +113,35 @@ def test_canonicalize_rejects_live_urls_and_possible_phone_numbers() -> None:
         canonicalize_row(
             instruction_row("Use www.not-reserved.invalid to confirm your internship.", completion), source_batch="pilot", generation_prompt_version="v1"
         )
+
+
+def test_convert_csv_supports_fenced_enhanced_completion_and_source_override(tmp_path) -> None:
+    message = "Security reminder: never share your OTP with anyone."
+    completion = {
+        "message_text": message,
+        "label": "LEGITIMATE",
+        "scam_type": None,
+        "language": "en",
+        "channel": "sms",
+        "tactics": ["protective_warning"],
+        "evidence_quotes": ["never share your OTP"],
+        "rationale": "This is protective advice.",
+        "difficulty": "hard_negative",
+        "template_family": "security-warning",
+    }
+    raw_path = tmp_path / "export.csv"
+    with raw_path.open("w", newline="", encoding="utf-8") as file:
+        writer = csv.DictWriter(file, fieldnames=["enhanced_prompt", "enhanced_completion"])
+        writer.writeheader()
+        writer.writerow({
+            "enhanced_prompt": f"MESSAGE_TO_CLASSIFY_BEGIN{message}MESSAGE_TO_CLASSIFY_END",
+            "enhanced_completion": "```json\n" + json.dumps(completion) + "\n```",
+        })
+
+    summary = convert_jsonl(raw_path, tmp_path / "converted", source_batch="pilot-1", generation_prompt_version="v2", source="invented")
+
+    assert summary.accepted == 1
+    with (tmp_path / "converted" / "accepted.csv").open(encoding="utf-8") as file:
+        row = list(csv.DictReader(file))[0]
+    assert row["source"] == "invented"
+    assert row["review_status"] == "unreviewed"
