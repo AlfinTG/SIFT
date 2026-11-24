@@ -40,32 +40,48 @@ body {
   background: #a2aba5;
 }
 
-/* Assessment Card Theming */
-.assessment-critical {
-  background-color: #2b1110;
+/* Layer 1 Result Card Variants */
+.verdict-critical {
+  background-color: #fdf2f2;
+  border: 1.5px solid #f8b4b4;
+  color: #1e1e1e;
+}
+.verdict-critical .verdict-badge {
+  background-color: #ba1a1a;
   color: #ffffff;
-  border: 1px solid #7f1d1d;
 }
 
-.assessment-high {
+.verdict-high {
+  background-color: #fef7ec;
+  border: 1.5px solid #fbd5a5;
+  color: #1e1e1e;
+}
+.verdict-high .verdict-badge {
+  background-color: #b45309;
+  color: #ffffff;
+}
+
+.verdict-moderate {
+  background-color: #fefce8;
+  border: 1.5px solid #fef08a;
+  color: #1e1e1e;
+}
+.verdict-moderate .verdict-badge {
+  background-color: #546500;
+  color: #ffffff;
+}
+
+.verdict-low_indicators {
+  background-color: #f0fdf4;
+  border: 1.5px solid #bbf7d0;
+  color: #1e1e1e;
+}
+.verdict-low_indicators .verdict-badge {
   background-color: #174c38;
   color: #ffffff;
-  border: 1px solid #103829;
 }
 
-.assessment-moderate {
-  background-color: #2f2a15;
-  color: #ffffff;
-  border: 1px solid #78350f;
-}
-
-.assessment-low_indicators {
-  background-color: #182b20;
-  color: #ffffff;
-  border: 1px solid #234f3a;
-}
-
-/* Subtle transitions */
-button, a, input, textarea, select {
+/* Interactive transitions */
+button, a, input, textarea, select, details summary {
   transition: all 0.15s ease-in-out;
 }
