@@ -1,0 +1,16 @@
+SIFT — LEGITIMATE HARD-NEGATIVE BATCH PROMPT
+
+Use the SIFT Dataset Generation Master Specification. Generate only LEGITIMATE fictional inbound messages for an India-focused scam-message classifier. These are important hard negatives: they should look realistic and may share vocabulary or contexts with scam messages, but must not contain a deceptive request.
+
+Include a varied mix of:
+- Protective warnings such as “Never share your OTP, password, or UPI PIN.”
+- Ordinary bank/payment notifications that do not request credentials or payment to release funds.
+- Normal delivery updates and tracking notifications.
+- Routine job/internship communications that do not demand a fee or sensitive credential.
+- School/college and event notices.
+- Non-deceptive offers, discounts, and service announcements.
+- Ordinary refund status messages that do not require a QR scan, UPI PIN, OTP, or collect approval.
+
+Important: Do not make all examples extremely obvious or generic. Use varied lengths, tone, channels, and realistic details. Include some hard negatives containing words like OTP, bank, urgent, payment, account, link, reward, job, or KYC—but the message must remain benign in context. A warning not to share an OTP is LEGITIMATE. A tracking link alone is not a scam. A deadline alone is not proof of fraud.
+
+Do not include real phone numbers, bank details, UPI IDs, credentials, or live URLs. Use fictional entities and reserved example domains. Completion JSON must follow the master specification, use `label` = `LEGITIMATE`, `scam_type` = `none`, and provide evidence quotes/rationale consistent with the message.

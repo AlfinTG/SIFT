@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIFT — Evidence-First Scam Detection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#003523',
+            'primary-container': '#174c38',
+            'on-primary': '#ffffff',
+            'on-primary-container': '#87bba2',
+            secondary: '#546500',
+            'secondary-container': '#d1ec64',
+            'secondary-fixed': '#d4ee66',
+            'secondary-fixed-dim': '#b8d24d',
+            'on-secondary': '#ffffff',
+            'on-secondary-container': '#181e00',
+            surface: '#f5fbf4',
+            'surface-dim': '#d6dcd5',
+            'surface-container-lowest': '#ffffff',
+            'surface-container-low': '#eff5ee',
+            'surface-container': '#eaefe9',
+            'surface-container-high': '#e4eae3',
+            'surface-container-highest': '#dee4de',
+            'on-surface': '#171d19',
+            'on-surface-variant': '#404944',
+            error: '#ba1a1a',
+            'error-container': '#ffdad6',
+            'on-error-container': '#93000a',
+            outline: '#707973',
+            'outline-variant': '#c0c9c2',
+            canvas: '#f7f3e8',
+            line: '#ddd7c5',
+            lime: '#d8f36a'
+          },
+          fontFamily: {
+            display: ['Newsreader', 'Georgia', 'serif'],
+            headline: ['Newsreader', 'Georgia', 'serif'],
+            body: ['"Hanken Grotesk"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body class="bg-surface text-on-surface font-body min-h-screen flex flex-col antialiased selection:bg-secondary-container selection:text-on-secondary-container">
+
+  <!-- Fixed Top Header -->
+  <header class="fixed top-0 w-full z-50 bg-[#F7F3E8] border-b border-[#DDD7C5] shadow-[0_1px_8px_rgba(0,0,0,0.03)]">
+    <div class="h-16 max-w-6xl mx-auto px-4 md:px-6 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-4 min-w-max">
+        <div class="flex items-center gap-2 cursor-pointer" id="brandLogo">
+          <div class="w-8 h-8 rounded-lg bg-primary-container text-secondary-fixed flex items-center justify-center font-bold text-lg shadow-sm">
+            S
+          </div>
+          <span class="font-headline text-xl md:text-2xl text-primary font-bold tracking-tight">SIFT</span>
+        </div>
+        <span class="hidden lg:inline-block h-4 w-px bg-outline-variant"></span>
+        <span class="hidden lg:inline-block text-sm text-on-surface-variant font-medium">Evidence-First Scam Detection</span>
+        <span class="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container-high border border-outline-variant font-mono text-xs text-on-surface-variant">
+          <span class="material-symbols-outlined text-[13px] text-primary">lock</span>
+          Local Sandbox · Zero Retention
+        </span>
+      </div>
+
+      <nav class="flex items-center gap-1 p-1 bg-surface-container-low rounded-lg border border-outline-variant">
+        <button id="navAnalyze" type="button" class="px-3.5 py-1.5 rounded-md text-sm font-medium transition-colors bg-primary-container text-on-primary shadow-sm">
+          Analyze
+        </button>
+        <button id="navReport" type="button" class="px-3.5 py-1.5 rounded-md text-sm font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors">
+          Assessment Report
+        </button>
+        <button id="navEvidence" type="button" class="px-3.5 py-1.5 rounded-md text-sm font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors">
+          Evidence Trail
+        </button>
+      </nav>
+
+      <div class="flex items-center gap-3 min-w-max">
+        <div class="hidden md:flex items-center gap-2 px-2.5 py-1 rounded-full bg-surface-container-lowest border border-outline-variant">
+          <span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
+          <span class="font-mono text-xs text-on-surface">Zero-Retention Engine</span>
+        </div>
+        <span class="hidden sm:inline-block px-2.5 py-1 rounded-full bg-[#D8F36A] text-xs text-[#202622] font-semibold border border-[#b8d24d]">
+          Hackathon Demo Mode
+        </span>
+        <button id="quickResetBtn" class="p-1.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container transition-colors flex items-center justify-center" title="Quick Reset Workspace" type="button">
+          <span class="material-symbols-outlined text-[19px]">restart_alt</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Viewport Shell -->
+  <main class="w-full max-w-6xl mx-auto px-4 md:px-6 pt-20 flex-1">
+    <div class="flex flex-col w-full py-6 md:py-8">
+
+      <!-- Eyebrow & Brand Dossier Tag -->
+      <div class="flex items-center justify-between flex-wrap gap-4 mb-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-high text-primary-container text-xs font-semibold uppercase tracking-wider">
+          <span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+          <span>Privacy-First Threat Intelligence</span>
+        </div>
+        <div class="flex items-center gap-2 text-on-surface-variant font-mono text-xs">
+          <span class="inline-block w-1.5 h-1.5 rounded-full bg-secondary"></span>
+          <span>Ephemeral Session: <strong class="text-on-surface font-semibold tracking-tight" id="sessionTag">SIFT-9402-LIVE</strong></span>
+        </div>
+      </div>
+
+      <!-- Editorial Headline Section -->
+      <div class="relative mb-8">
+        <h1 class="font-display text-4xl md:text-5xl lg:text-6xl text-on-surface tracking-tight leading-none mb-3">
+          Don't just read it. <span class="italic text-primary-container">Sift through it.</span>
+        </h1>
+        <p class="font-body text-base md:text-lg text-on-surface-variant max-w-3xl leading-relaxed">
+          Scammers prey on urgency and subtle manipulation. SIFT deconstructs deceptive messages and masquerading links into verifiable forensic evidence—without retaining your raw data.
+        </p>
+      </div>
+
+      <!-- Asymmetric Dossier Workdesk Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+        <!-- Left Column: Primary Intake Terminal (Columns 1-8) -->
+        <div class="lg:col-span-8 flex flex-col gap-5">
+
+          <!-- Input Mode Segmented Control -->
+          <div class="flex items-center justify-between flex-wrap gap-2 p-1.5 bg-surface-container rounded-xl">
+            <div class="flex items-center gap-1" id="modeSelector">
+              <button class="mode-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-primary-container text-on-primary shadow-sm flex items-center gap-2" data-mode="message" type="button">
+                <span class="material-symbols-outlined text-[18px]">sms</span>
+                <span>Message Text</span>
+              </button>
+              <button class="mode-btn px-4 py-2 rounded-lg text-sm font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-all flex items-center gap-2" data-mode="url" type="button">
+                <span class="material-symbols-outlined text-[18px]">link</span>
+                <span>Direct URL</span>
+              </button>
+              <button class="mode-btn px-4 py-2 rounded-lg text-sm font-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-all flex items-center gap-2" data-mode="combined" type="button">
+                <span class="material-symbols-outlined text-[18px]">tune</span>
+                <span>Message &amp; URL</span>
+              </button>
+            </div>
+            <div class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-md bg-surface-container-lowest font-mono text-xs text-on-surface-variant">
+              <span class="material-symbols-outlined text-[15px] text-secondary">memory</span>
+              <span>Zero-Retention Buffering</span>
+            </div>
+          </div>
+
+          <!-- Tactile Card Container -->
+          <div class="bg-surface-container-lowest rounded-xl shadow-sm border border-[#DDD7C5] p-5 md:p-6 flex flex-col gap-4 relative">
+
+            <!-- Top Toolbar inside Terminal -->
+            <div class="flex items-center justify-between pb-3 bg-surface-container-low -mx-5 -mt-5 md:-mx-6 md:-mt-6 px-5 py-3 rounded-t-xl border-b border-[#DDD7C5]">
+              <div class="flex items-center gap-2 font-mono text-xs text-on-surface">
+                <span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
+                <span class="font-semibold uppercase tracking-wider">Payload Intake Console</span>
+                <span class="text-on-surface-variant font-normal hidden sm:inline">| Local Heuristics Stream</span>
+              </div>
+              <div class="flex items-center gap-2 font-mono text-xs text-on-surface-variant">
+                <span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+                <span>Rules Engine Active</span>
+              </div>
+            </div>
+
+            <!-- Form Validation Error Banner -->
+            <div id="form-error" class="hidden p-3 rounded-lg border border-error-container bg-error-container text-on-error-container font-mono text-xs flex items-center justify-between gap-2" role="alert">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px] text-error">error</span>
+                <span id="form-error-text">Please enter a message or a valid URL before running analysis.</span>
+              </div>
+              <button type="button" id="form-error-close" class="text-on-error-container hover:opacity-75">
+                <span class="material-symbols-outlined text-[16px]">close</span>
+              </button>
+            </div>
+
+            <!-- Analysis Progress State Bar -->
+            <div id="analysisProgressState" class="hidden p-3.5 rounded-lg bg-surface-container border border-outline-variant flex flex-col gap-2">
+              <div class="flex items-center justify-between font-mono text-xs">
+                <span class="flex items-center gap-2 text-primary font-medium">
+                  <span class="material-symbols-outlined text-[16px] animate-spin">sync</span>
+                  Analyzing payload locally across deterministic rule sets...
+                </span>
+                <span class="text-on-surface-variant text-[11px]">Local RAM Sandbox</span>
+              </div>
+              <div class="w-full bg-surface-container-highest h-1.5 rounded-full overflow-hidden">
+                <div class="bg-primary-container h-full rounded-full w-3/4 animate-pulse"></div>
+              </div>
+            </div>
+
+            <!-- Textarea Input Field -->
+            <div class="relative flex flex-col" id="messageGroup">
+              <label for="message" class="text-xs font-mono font-semibold uppercase tracking-wider text-on-surface-variant mb-1.5 flex items-center justify-between">
+                <span>Message Payload</span>
+                <span class="text-[11px] font-normal lowercase">max 10,000 chars</span>
+              </label>
+              <textarea id="message" rows="6" maxlength="10000" class="w-full p-3.5 rounded-lg border border-outline-variant bg-[#FAF8F2] text-on-surface font-body text-sm md:text-base placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white resize-y leading-relaxed" placeholder="Paste an SMS, email snippet, WhatsApp notification, or suspicious message here to sift through evidence..."></textarea>
+            </div>
+
+            <!-- Direct URL Field -->
+            <div class="flex flex-col" id="urlGroup">
+              <label for="url" class="text-xs font-mono font-semibold uppercase tracking-wider text-on-surface-variant mb-1.5 flex items-center justify-between">
+                <span>URL for Structural Inspection (Optional)</span>
+                <span class="text-[11px] font-normal lowercase">local parsing only · never fetched</span>
+              </label>
+              <div class="relative flex items-center">
+                <span class="material-symbols-outlined absolute left-3 text-outline text-[18px]">link</span>
+                <input id="url" type="url" inputmode="url" maxlength="2048" autocomplete="off" class="w-full pl-9 pr-3.5 py-2.5 rounded-lg border border-outline-variant bg-[#FAF8F2] text-on-surface font-mono text-sm placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white" placeholder="https://example.com/login?token=...">
+              </div>
+            </div>
+
+            <!-- Incident Context & Inspection Options -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+              <div class="flex flex-col">
+                <label for="incident-status" class="text-xs font-mono font-semibold uppercase tracking-wider text-on-surface-variant mb-1.5">
+                  What Happened? (Incident Context)
+                </label>
+                <select id="incident-status" class="w-full py-2.5 px-3 rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface font-body text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                  <option value="received_only">I only received the message</option>
+                  <option value="clicked_link">I clicked the link</option>
+                  <option value="shared_personal_data">I shared personal information</option>
+                  <option value="shared_credentials">I shared an OTP, password, or PIN</option>
+                  <option value="made_payment">I made a payment</option>
+                </select>
+              </div>
+
+              <div class="flex flex-col justify-end">
+                <label class="flex items-center gap-2.5 p-2 rounded-lg bg-surface-container-low border border-outline-variant cursor-pointer select-none">
+                  <input type="checkbox" id="includeUrlInspection" checked class="w-4 h-4 text-primary-container rounded border-outline-variant focus:ring-primary">
+                  <div class="flex flex-col min-w-0">
+                    <span class="text-xs font-semibold text-on-surface">Enable Local URL Structure Inspection</span>
+                    <span class="text-[11px] text-on-surface-variant">Checks host, IP patterns &amp; shorteners locally</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Character & Metadata Ribbon -->
+            <div class="pt-2 border-t border-outline-variant flex items-center justify-between text-on-surface-variant font-mono text-xs">
+              <span id="tokenCount">0 chars | ~0 tokens</span>
+              <span class="text-[11px] text-on-surface-variant">Local Memory Buffer</span>
+            </div>
+
+            <!-- Action Row -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
+              <div class="flex items-center gap-2">
+                <button class="px-3.5 py-2 rounded-lg bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest hover:text-on-surface font-medium text-xs transition-colors flex items-center justify-center gap-1.5" id="clearBtn" type="button">
+                  <span class="material-symbols-outlined text-[16px]">delete_sweep</span>
+                  <span>Clear Input</span>
+                </button>
+                <button class="px-3 py-2 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface font-medium text-xs transition-colors flex items-center gap-1" id="pasteSampleBtn" type="button">
+                  <span class="material-symbols-outlined text-[16px]">content_paste</span>
+                  <span>Paste Clipboard</span>
+                </button>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button class="group relative px-6 py-2.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-medium text-sm transition-all shadow-sm flex items-center justify-center gap-2" id="analyze" type="button">
+                  <span id="analyzeBtnText">Sift for Deceptive Patterns</span>
+                  <span class="flex items-center justify-center w-5 h-5 rounded-full bg-secondary-container text-on-secondary-container group-hover:translate-x-0.5 transition-transform">
+                    <span class="material-symbols-outlined text-[13px] font-bold">arrow_forward</span>
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Safety Notice -->
+            <div class="p-3 rounded-lg bg-surface-container-low border border-outline-variant text-xs text-on-surface-variant flex items-start gap-2">
+              <span class="material-symbols-outlined text-[16px] text-primary shrink-0 mt-0.5">info</span>
+              <p class="leading-normal">
+                Core scanning runs locally. This foundation uses deterministic safety rules and URL structure checks; the ML model is not installed yet. A low-indicator result never means verified safe.
+              </p>
+            </div>
+          </div>
+
+          <!-- Pre-Loaded Investigation Scenarios -->
+          <div class="bg-surface-container-low rounded-xl p-4 md:p-5 flex flex-col gap-3 border border-[#DDD7C5]">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider text-on-surface-variant font-semibold">
+                <span class="material-symbols-outlined text-[16px] text-primary">science</span>
+                <span>Pre-Loaded Investigation Scenarios</span>
+              </div>
+              <span class="font-mono text-xs text-on-surface-variant">Click to load &amp; scan</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5" id="scenarioGrid">
+              <!-- Preset 1: Fake Internship -->
+              <button class="scenario-btn text-left p-3 rounded-lg bg-surface-container-lowest hover:bg-surface-container-high transition-all flex flex-col gap-1 group border border-outline-variant shadow-sm" data-scenario="internship" type="button">
+                <div class="flex items-center justify-between w-full">
+                  <span class="font-medium text-xs text-on-surface group-hover:text-primary font-body">Internship Fee Offer</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[10px] bg-error-container text-on-error-container font-semibold">High Risk</span>
+                </div>
+                <p class="text-xs text-on-surface-variant line-clamp-2">
+                  "Congratulations, you are shortlisted... Pay ₹799 as registration fee today..."
+                </p>
+              </button>
+
+              <!-- Preset 2: UPI Refund PIN -->
+              <button class="scenario-btn text-left p-3 rounded-lg bg-surface-container-lowest hover:bg-surface-container-high transition-all flex flex-col gap-1 group border border-outline-variant shadow-sm" data-scenario="upipin" type="button">
+                <div class="flex items-center justify-between w-full">
+                  <span class="font-medium text-xs text-on-surface group-hover:text-primary font-body">UPI Refund PIN Trap</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[10px] bg-error-container text-on-error-container font-semibold">Critical</span>
+                </div>
+                <p class="text-xs text-on-surface-variant line-clamp-2">
+                  "Your refund is pending. Scan QR code and enter UPI PIN immediately..."
+                </p>
+              </button>
+
+              <!-- Preset 3: Legitimate OTP Reminder -->
+              <button class="scenario-btn text-left p-3 rounded-lg bg-surface-container-lowest hover:bg-surface-container-high transition-all flex flex-col gap-1 group border border-outline-variant shadow-sm" data-scenario="legitotp" type="button">
+                <div class="flex items-center justify-between w-full">
+                  <span class="font-medium text-xs text-on-surface group-hover:text-primary font-body">Security Reminder</span>
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[10px] bg-secondary-container text-on-secondary-container font-semibold">Low Ind.</span>
+                </div>
+                <p class="text-xs text-on-surface-variant line-clamp-2">
+                  "Security reminder: Never share your OTP, password, or UPI PIN with anyone."
+                </p>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Live Telemetry & Inspection Posture (Columns 9-12) -->
+        <div class="lg:col-span-4 flex flex-col gap-4">
+
+          <!-- Inspection Posture Card -->
+          <div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm border border-[#DDD7C5] flex flex-col gap-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <h2 class="font-headline text-lg text-on-surface font-semibold">Inspection Posture</h2>
+              </div>
+              <span id="postureStatusBadge" class="font-mono text-xs px-2 py-0.5 rounded-md bg-secondary-container text-on-secondary-container font-bold">READY</span>
+            </div>
+
+            <!-- Radial Gauge Indicator -->
+            <div class="flex items-center gap-4 bg-surface-container-low p-3.5 rounded-xl border border-outline-variant">
+              <div class="relative w-16 h-16 flex-shrink-0 flex items-center justify-center">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                  <path class="text-surface-container-high" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.5"></path>
+                  <path id="gaugeSvg" class="text-primary-container transition-all duration-700 ease-out" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="15, 100" stroke-linecap="round" stroke-width="3.5"></path>
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                  <span id="threatScoreDisplay" class="font-headline text-base text-on-surface font-bold leading-none">--</span>
+                  <span class="font-mono text-[9px] text-on-surface-variant uppercase">Level</span>
+                </div>
+              </div>
+              <div class="flex flex-col min-w-0">
+                <span id="postureLabel" class="font-medium text-sm text-on-surface truncate">Awaiting Content</span>
+                <span id="postureSub" class="text-xs text-on-surface-variant">Input payload to activate local inspection.</span>
+              </div>
+            </div>
+
+            <!-- Telemetry Checklist -->
+            <div class="flex flex-col gap-2 font-mono text-xs">
+              <div class="flex items-center justify-between p-2 rounded-lg bg-surface-container border border-outline-variant">
+                <span class="text-on-surface-variant flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[15px] text-secondary">check_circle</span>
+                  Rule-Based Detection
+                </span>
+                <span class="font-medium text-primary-container">Active</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-surface-container border border-outline-variant">
+                <span class="text-on-surface-variant flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[15px] text-secondary">check_circle</span>
+                  URL Structural Inspector
+                </span>
+                <span class="font-medium text-primary-container">Active</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-surface-container border border-outline-variant">
+                <span class="text-on-surface-variant flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[15px] text-secondary">check_circle</span>
+                  Incident Context Engine
+                </span>
+                <span class="font-medium text-primary-container">Active</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-surface-container-low border border-outline-variant text-[11px]">
+                <span class="text-on-surface flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[15px] text-outline">smart_toy</span>
+                  ML Classifier Model
+                </span>
+                <span class="font-mono px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant font-medium">Rules-Only Fallback</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- What SIFT Extracts Explainer Card -->
+          <div class="bg-surface-container rounded-xl p-4 flex flex-col gap-2 border border-outline-variant">
+            <div class="flex items-center gap-2 text-primary-container text-xs font-semibold uppercase tracking-wider">
+              <span class="material-symbols-outlined text-[17px]">find_in_page</span>
+              <span>What SIFT Extracts</span>
+            </div>
+            <p class="text-xs text-on-surface-variant leading-relaxed">
+              SIFT isolates coercion patterns, upfront payment fees, unverified shorteners, direct IP hosts, and credential manipulation vectors.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RESULTS SECTION (Initially Hidden) -->
+      <section id="results" class="results mt-10 flex flex-col gap-8" aria-live="polite" aria-labelledby="results-heading" hidden>
+
+        <!-- Results Section Anchor & Header -->
+        <div class="flex flex-col gap-2 pb-2 border-b border-[#DDD7C5]">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-[22px]">assignment_turned_in</span>
+              <h2 id="results-heading" class="font-headline text-2xl md:text-3xl text-on-surface font-semibold">
+                SIFT Analysis Result &amp; Evidence Trail
+              </h2>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs px-2.5 py-1 rounded-full bg-surface-container-high border border-outline-variant text-on-surface-variant">
+                Evaluated Locally
+              </span>
+              <button id="copyReportBtn" class="flex items-center gap-1.5 px-3 py-1 rounded bg-surface-container hover:bg-surface-container-high transition-colors font-medium text-xs text-on-surface border border-outline-variant" type="button">
+                <span class="material-symbols-outlined text-[15px]">content_copy</span>
+                <span>Copy Summary</span>
+              </button>
+            </div>
+          </div>
+          <p class="text-xs text-on-surface-variant font-mono">
+            Absence of detected indicators never certifies absolute safety. All results are uncertain and explainable.
+          </p>
+        </div>
+
+        <!-- 1. Primary Assessment Banner (Screen 2 Dossier Card) -->
+        <div id="assessment" class="rounded-xl p-6 md:p-8 shadow-sm transition-all duration-300">
+          <!-- Populated by renderResult -->
+        </div>
+
+        <!-- 2. Evidence Found (Grouped Signals) -->
+        <div class="flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-[20px]">troubleshoot</span>
+              <h3 class="font-headline text-xl text-on-surface font-semibold">Forensic Signals &amp; Evidence Trail</h3>
+            </div>
+            <span id="signalCountBadge" class="font-mono text-xs text-on-surface-variant px-2.5 py-0.5 rounded-full bg-surface-container">0 signals found</span>
+          </div>
+          <div id="signals" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Populated by renderResult -->
+          </div>
+        </div>
+
+        <!-- 3. Safe Next Steps & URL Inspections Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+          <!-- Left: Safe Next Steps (Incident Aware) -->
+          <div class="lg:col-span-6 bg-surface-container-low rounded-xl p-6 border border-[#DDD7C5] flex flex-col gap-4 shadow-sm">
+            <div class="flex items-center gap-2 text-primary font-headline text-lg font-semibold">
+              <span class="material-symbols-outlined text-primary-container text-[22px]">health_and_safety</span>
+              <h4>Safe Next Steps</h4>
+            </div>
+            <p class="text-xs text-on-surface-variant">
+              Recommended actions adapted directly to your selected incident context:
+            </p>
+            <ul id="next-steps" class="flex flex-col gap-2.5">
+              <!-- Populated by renderResult -->
+            </ul>
+          </div>
+
+          <!-- Right: Local URL Inspection Details -->
+          <div class="lg:col-span-6 bg-surface-container-lowest rounded-xl p-6 border border-[#DDD7C5] flex flex-col gap-4 shadow-sm">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 text-on-surface font-headline text-lg font-semibold">
+                <span class="material-symbols-outlined text-primary text-[22px]">link</span>
+                <h4>URL Inspection Breakdown</h4>
+              </div>
+              <span class="font-mono text-[11px] px-2 py-0.5 rounded bg-surface-container text-on-surface-variant">Local Parsing Only</span>
+            </div>
+            <p class="text-xs text-on-surface-variant">
+              URLs are structurally inspected locally. SIFT never opens them, follows redirects, queries DNS, or uses live reputation lookups.
+            </p>
+            <div id="url-inspections" class="flex flex-col gap-3">
+              <!-- Populated by renderResult -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 4. Mandatory Limitations & Engine State -->
+        <div class="bg-surface-container rounded-xl p-6 border border-outline-variant flex flex-col gap-3">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-2 text-on-surface font-semibold text-sm">
+              <span class="material-symbols-outlined text-primary text-[18px]">verified_user</span>
+              <h4>What SIFT Cannot Verify (Mandatory Scope &amp; Limitations)</h4>
+            </div>
+            <span class="font-mono text-xs text-on-surface-variant">Rules-Only Build</span>
+          </div>
+          <ul id="limitations" class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-on-surface-variant">
+            <!-- Populated by renderResult -->
+          </ul>
+        </div>
+
+      </section>
+
+      <!-- Privacy Reassurance Dossier Panel (Full Width Bottom) -->
+      <div class="mt-12 bg-surface-container-low rounded-xl p-6 shadow-sm border border-[#DDD7C5]">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
+          <div class="flex items-center gap-2.5">
+            <span class="material-symbols-outlined text-primary text-[22px]">enhanced_encryption</span>
+            <h3 class="font-headline text-lg md:text-xl text-on-surface font-semibold">SIFT Ephemeral Guarantee</h3>
+          </div>
+          <span class="font-mono text-xs text-on-surface-variant uppercase tracking-wider">Independent Sandbox Standard</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-surface-container-lowest p-4 rounded-xl flex flex-col gap-2 border border-outline-variant">
+            <div class="flex items-center gap-2 text-primary font-semibold text-xs">
+              <span class="w-6 h-6 rounded-md bg-surface-container-high flex items-center justify-center font-mono text-xs">01</span>
+              <span>Zero Raw Storage</span>
+            </div>
+            <p class="text-xs text-on-surface-variant leading-relaxed">
+              Your input strings and URLs exist solely in temporary browser runtime. Refreshing or concluding this session instantly purges volatile buffers.
+            </p>
+          </div>
+          <div class="bg-surface-container-lowest p-4 rounded-xl flex flex-col gap-2 border border-outline-variant">
+            <div class="flex items-center gap-2 text-primary font-semibold text-xs">
+              <span class="w-6 h-6 rounded-md bg-surface-container-high flex items-center justify-center font-mono text-xs">02</span>
+              <span>Local Rule Safety</span>
+            </div>
+            <p class="text-xs text-on-surface-variant leading-relaxed">
+              Detection is powered by transparent, verifiable rule heuristics and structural URL syntax validation. SIFT does not ping external servers.
+            </p>
+          </div>
+          <div class="bg-surface-container-lowest p-4 rounded-xl flex flex-col gap-2 border border-outline-variant">
+            <div class="flex items-center gap-2 text-primary font-semibold text-xs">
+              <span class="w-6 h-6 rounded-md bg-surface-container-high flex items-center justify-center font-mono text-xs">03</span>
+              <span>Auditable Evidence Trail</span>
+            </div>
+            <p class="text-xs text-on-surface-variant leading-relaxed">
+              Rather than opaque black-box verdicts, SIFT outputs a structured, human-readable forensic report mapping every specific clause to known scam vectors.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Ephemeral Toast Notice for UI Feedback -->
+  <div class="fixed bottom-6 right-6 z-50 transform translate-y-16 opacity-0 transition-all duration-300 pointer-events-none bg-primary text-on-primary px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 font-mono text-xs" id="dossierToast">
+    <span class="material-symbols-outlined text-secondary-fixed text-[18px]">check_circle</span>
+    <span id="toastMessage">Evidence report copied to clipboard.</span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="w-full bg-[#F7F3E8] border-t border-[#DDD7C5] py-4 mt-auto">
+    <div class="max-w-6xl mx-auto px-4 md:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
+      <div class="flex items-center gap-2 font-mono text-xs text-on-surface-variant">
+        <span class="material-symbols-outlined text-[16px] text-primary">verified_user</span>
+        <span>Local foundation build · Submitted content is not stored by SIFT.</span>
+      </div>
+      <div class="font-mono text-xs text-on-surface-variant flex items-center gap-4">
+        <span>Dossier Protocol v1.4</span>
+        <span class="text-outline-variant">•</span>
+        <span>Memory Sandbox: Active</span>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

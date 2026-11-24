@@ -1,0 +1,22 @@
+SIFT Project Pack files
+=======================
+ADAPTION_DATASET_GENERATION.md
+ARCHITECTURE.md
+COMPETITIVE_POSITIONING.md
+DATA_DICTIONARY.md
+DECISIONS_AND_OPEN_QUESTIONS.md
+DEMO_PLAN.md
+DIFFERENTIATION.md
+HACKATHON_EXECUTION_PLAN.md
+ML_AND_DATA_PLAN.md
+PRODUCT_VISION.md
+PROJECT_INSTRUCTIONS.md
+README.md
+REQUIREMENTS.md
+SAFETY_PRIVACY.md
+TESTING_AND_EVALUATION.md
+UI_UX_GUIDE.md
+dataset_prompts/adaption_invent_master_prompt.txt
+dataset_prompts/adaption_legitimate_hard_negatives_prompt.txt
+dataset_prompts/adaption_scam_messages_prompt.txt
+templates/training_data_template.csv

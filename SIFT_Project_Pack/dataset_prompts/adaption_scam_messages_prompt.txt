@@ -1,0 +1,7 @@
+SIFT — SCAM-POSITIVE BATCH PROMPT
+
+Use the SIFT Dataset Generation Master Specification. Generate only clearly SCAM-labelled fictional inbound messages for an India-focused scam-message classifier. Aim for a balanced mix across these four families: fake jobs/internships, phishing/KYC/account pressure, UPI/payment/refund fraud, and reward/lottery bait. If one run is dedicated to a single family, focus exclusively on that family and vary scenarios within it.
+
+Examples should not all use the same “pay now” wording. Include varied channels, message lengths, sender framings, pressure tactics, and wording. Some examples may contain no URL; others may include a fictional reserved example domain. Include explicit fee demands, OTP/PIN/password requests, QR/refund manipulation, false selection/prize claims, and impersonation patterns where context makes the deceptive intent clear.
+
+Do not include any legitimate examples in this batch. Do not include ambiguous examples unless a separate ambiguous batch is explicitly requested. Never include real brands in a way that implies an actual incident, real contact details, live malicious URLs, or usable credentials. Completion JSON must follow the schema in the master specification. Ensure exact evidence quotes and consistent labels.

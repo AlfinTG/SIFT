@@ -1,0 +1,18 @@
+{
+  "manifest_version": "sift-pilot-v1",
+  "description": "Controlled 96-row synthetic pilot. Counts apply only to manually accepted rows.",
+  "strata": [
+    {"stratum_id":"scam-fake_job","source_batch":"sift-pilot-v1-scam","label":"SCAM","context_family":"fake_job","target_count":10,"difficulty":"easy_or_edge_case","template_family_prefix":"sift-pilot-v1-scam-fake_job-"},
+    {"stratum_id":"scam-phishing_kyc","source_batch":"sift-pilot-v1-scam","label":"SCAM","context_family":"phishing_kyc","target_count":10,"difficulty":"easy_or_edge_case","template_family_prefix":"sift-pilot-v1-scam-phishing_kyc-"},
+    {"stratum_id":"scam-upi_payment","source_batch":"sift-pilot-v1-scam","label":"SCAM","context_family":"upi_payment","target_count":10,"difficulty":"easy_or_edge_case","template_family_prefix":"sift-pilot-v1-scam-upi_payment-"},
+    {"stratum_id":"scam-reward_lottery","source_batch":"sift-pilot-v1-scam","label":"SCAM","context_family":"reward_lottery","target_count":10,"difficulty":"easy_or_edge_case","template_family_prefix":"sift-pilot-v1-scam-reward_lottery-"},
+    {"stratum_id":"legitimate-fake_job","source_batch":"sift-pilot-v1-legitimate","label":"LEGITIMATE","context_family":"fake_job","target_count":10,"difficulty":"hard_negative","template_family_prefix":"sift-pilot-v1-legitimate-fake_job-"},
+    {"stratum_id":"legitimate-phishing_kyc","source_batch":"sift-pilot-v1-legitimate","label":"LEGITIMATE","context_family":"phishing_kyc","target_count":10,"difficulty":"hard_negative","template_family_prefix":"sift-pilot-v1-legitimate-phishing_kyc-"},
+    {"stratum_id":"legitimate-upi_payment","source_batch":"sift-pilot-v1-legitimate","label":"LEGITIMATE","context_family":"upi_payment","target_count":10,"difficulty":"hard_negative","template_family_prefix":"sift-pilot-v1-legitimate-upi_payment-"},
+    {"stratum_id":"legitimate-reward_lottery","source_batch":"sift-pilot-v1-legitimate","label":"LEGITIMATE","context_family":"reward_lottery","target_count":10,"difficulty":"hard_negative","template_family_prefix":"sift-pilot-v1-legitimate-reward_lottery-"},
+    {"stratum_id":"ambiguous-fake_job","source_batch":"sift-pilot-v1-ambiguous","label":"AMBIGUOUS","context_family":"fake_job","target_count":4,"difficulty":"ambiguous","template_family_prefix":"sift-pilot-v1-ambiguous-fake_job-"},
+    {"stratum_id":"ambiguous-phishing_kyc","source_batch":"sift-pilot-v1-ambiguous","label":"AMBIGUOUS","context_family":"phishing_kyc","target_count":4,"difficulty":"ambiguous","template_family_prefix":"sift-pilot-v1-ambiguous-phishing_kyc-"},
+    {"stratum_id":"ambiguous-upi_payment","source_batch":"sift-pilot-v1-ambiguous","label":"AMBIGUOUS","context_family":"upi_payment","target_count":4,"difficulty":"ambiguous","template_family_prefix":"sift-pilot-v1-ambiguous-upi_payment-"},
+    {"stratum_id":"ambiguous-reward_lottery","source_batch":"sift-pilot-v1-ambiguous","label":"AMBIGUOUS","context_family":"reward_lottery","target_count":4,"difficulty":"ambiguous","template_family_prefix":"sift-pilot-v1-ambiguous-reward_lottery-"}
+  ]
+}

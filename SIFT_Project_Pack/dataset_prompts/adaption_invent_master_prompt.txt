@@ -1,0 +1,67 @@
+SIFT DATASET GENERATION — MASTER SPECIFICATION
+
+Create a high-diversity synthetic dataset of short inbound digital messages for training and evaluating a scam-message classifier for an India-focused consumer safety prototype called SIFT. These are fictional examples, not real messages. The output must be an instruction dataset consisting of one classification prompt and one structured completion per row.
+
+TASK AND LABELS
+For every generated row, create exactly one plausible received message and label it as one of:
+- SCAM: clear deceptive intent or a clear attempt to obtain money, credentials, sensitive information, or unsafe action through fraud/impersonation.
+- LEGITIMATE: benign communication, ordinary notification, normal promotion, or protective security warning with no deceptive request.
+- AMBIGUOUS: context is insufficient or mixed; do not force a binary label.
+
+Do not label a message SCAM merely because it includes words such as OTP, bank, payment, urgent, account, link, reward, or job. Context and requested action determine the label.
+
+PROMPT FORMAT — REQUIRED
+The `enhanced_prompt` (or original prompt field) must contain this exact structure. Keep the task instruction stable across rows and put the generated message only between the delimiters:
+
+You are reviewing a message received by an ordinary user. Classify the message based only on its content. Do not assume facts that are not stated.
+
+MESSAGE_TO_CLASSIFY_BEGIN
+[insert one complete fictional message here]
+MESSAGE_TO_CLASSIFY_END
+
+Return the required JSON classification in the completion.
+
+COMPLETION FORMAT — REQUIRED
+Return only valid JSON, with no Markdown fences and no prose outside the JSON object. Use these keys:
+{
+  "label": "SCAM | LEGITIMATE | AMBIGUOUS",
+  "scam_type": "fake_job | phishing_kyc | upi_payment | reward_lottery | other | none",
+  "language": "en | hi | hinglish | mixed",
+  "channel": "sms | chat | email | social_dm | job_platform | other",
+  "tactics": ["short_snake_case_tags"],
+  "evidence_quotes": ["exact substrings from the message"],
+  "rationale": "One or two concise sentences grounded only in the message.",
+  "difficulty": "easy | hard_negative | ambiguous | edge_case",
+  "template_family": "stable short family identifier"
+}
+
+DIVERSITY REQUIREMENTS
+Vary naturally across rows:
+- Message length, syntax, tone, punctuation, formatting, and level of formality.
+- Sender framing: recruiter, HR assistant, bank-like notification, payment support, delivery service, school/college office, merchant, promotional sender, and unknown sender. Use fictional entities only.
+- Channel conventions: short SMS, conversational chat, formal email, social DM, and job-platform message.
+- Amounts and wording when relevant, without repeating one template.
+- Explicit and subtle forms of manipulation.
+- Messages with and without links.
+
+INDIA-RELEVANT CONTEXT
+Use plausible Indian context where appropriate: ₹ amounts, UPI, KYC, internships, campus placement, courier deliveries, bill payments, and common mobile messaging language. Use English as the primary language. Include a modest variety of natural Hinglish only when requested by the batch prompt. Do not caricature speakers or use implausible slang.
+
+SAFETY AND PRIVACY
+- Use fictional organization names and fictional people.
+- Use reserved example domains such as `example.com` or `.example`; never create a live malicious URL.
+- Never include real phone numbers, real UPI IDs, bank account numbers, card numbers, passwords, OTPs, CVVs, or other real credentials.
+- Use obvious placeholders where a reference is needed (e.g. `[fictional reference]`).
+- Do not provide operational instructions for committing fraud; write realistic victim-facing messages only.
+
+LABEL QUALITY
+- Include hard legitimate negatives: protective OTP warnings, normal delivery notices, ordinary payment confirmations, routine HR messages, non-deceptive promotions, and legitimate account notifications.
+- A security warning that says “Never share your OTP” is LEGITIMATE unless it also asks the user to disclose the OTP.
+- A message with a link is not automatically SCAM.
+- A message with urgency is not automatically SCAM.
+- A job offer is not automatically SCAM; look for explicit deception or suspicious requests.
+- Use AMBIGUOUS when key context is missing. Do not overstate certainty.
+- Every evidence quote must appear exactly in the message.
+- The rationale must agree with the label and evidence.
+
+Do not include analysis of the generation task, dataset statistics, headings, or multiple messages in a single row. Each row must represent one distinct inbound message and one corresponding completion.

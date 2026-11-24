@@ -1,0 +1,95 @@
+{
+  "disclaimer": "These hand-authored fixtures support demonstrations and regression tests only. They are not real-world validated data and must not be used as training data.",
+  "scenarios": [
+    {
+      "scenario_id": "fake_internship_registration_fee",
+      "message": "Congratulations, you are shortlisted for an internship. Pay ₹799 as a registration fee today to confirm your seat.",
+      "expected_risk_levels": ["high"],
+      "expected_evidence_categories": ["rule"],
+      "expected_signal_ids": ["upfront_job_fee", "urgency_pressure"],
+      "expected_behavior": "Returns an uncertain high assessment with an employment-fee warning and safe verification guidance.",
+      "purpose": "Demonstrates a high-concern fake-offer pattern."
+    },
+    {
+      "scenario_id": "upi_refund_pin_request",
+      "message": "Your refund is pending. Scan the QR code and enter your UPI PIN immediately to receive the amount.",
+      "expected_risk_levels": ["critical"],
+      "expected_evidence_categories": ["rule"],
+      "expected_signal_ids": ["credential_disclosure_request", "upi_refund_manipulation", "urgency_pressure"],
+      "expected_behavior": "Returns an uncertain critical assessment and tells the user not to scan, enter a PIN, or approve a request.",
+      "purpose": "Demonstrates a payment-manipulation pattern."
+    },
+    {
+      "scenario_id": "kyc_suspension_otp_phishing",
+      "message": "Your account will be suspended today. Reply with your OTP to complete your KYC.",
+      "expected_risk_levels": ["critical"],
+      "expected_evidence_categories": ["rule"],
+      "expected_signal_ids": ["credential_disclosure_request", "account_pressure", "urgency_pressure"],
+      "expected_behavior": "Returns an uncertain critical assessment because it requests a credential under account pressure.",
+      "purpose": "Demonstrates credential phishing with urgency."
+    },
+    {
+      "scenario_id": "prize_processing_fee_bait",
+      "message": "You are a prize winner. Pay a processing fee today to release your reward.",
+      "expected_risk_levels": ["high"],
+      "expected_evidence_categories": ["rule"],
+      "expected_signal_ids": ["reward_claim_fee", "urgency_pressure"],
+      "expected_behavior": "Returns an uncertain high assessment and advises against paying a claim fee.",
+      "purpose": "Demonstrates prize or lottery fee bait."
+    },
+    {
+      "scenario_id": "legitimate_otp_safety_warning",
+      "message": "Security reminder: Never share your OTP, password, or UPI PIN with anyone.",
+      "expected_risk_levels": ["low_indicators"],
+      "expected_evidence_categories": [],
+      "expected_signal_ids": [],
+      "expected_behavior": "Does not treat protective OTP advice as a credential request and remains explicitly uncertain.",
+      "purpose": "Regression check for protective-language false positives."
+    },
+    {
+      "scenario_id": "legitimate_payment_confirmation",
+      "message": "Payment confirmation: ₹799 was received successfully. Keep this receipt for your records.",
+      "expected_risk_levels": ["low_indicators"],
+      "expected_evidence_categories": [],
+      "expected_signal_ids": [],
+      "expected_behavior": "Does not escalate an ordinary payment confirmation and does not claim it is safe.",
+      "purpose": "Regression check for ordinary payment language."
+    },
+    {
+      "scenario_id": "legitimate_parcel_notification",
+      "message": "Your parcel has been delivered. View its status in the delivery app you normally use.",
+      "expected_risk_levels": ["low_indicators"],
+      "expected_evidence_categories": [],
+      "expected_signal_ids": [],
+      "expected_behavior": "Does not escalate an ordinary parcel notification and retains the safety limitation.",
+      "purpose": "Regression check for parcel wording."
+    },
+    {
+      "scenario_id": "legitimate_account_security_notification",
+      "message": "We noticed a sign-in to your account. Review activity in the official app, and never share your OTP.",
+      "expected_risk_levels": ["low_indicators"],
+      "expected_evidence_categories": [],
+      "expected_signal_ids": [],
+      "expected_behavior": "Does not confuse a protective account-security notice with account-pressure phishing.",
+      "purpose": "Regression check for account-security wording."
+    },
+    {
+      "scenario_id": "shortened_url_structure",
+      "message": "Please review the offer at https://bit.ly/offer.",
+      "expected_risk_levels": ["moderate"],
+      "expected_evidence_categories": ["url"],
+      "expected_signal_ids": ["url_shortener"],
+      "expected_behavior": "Parses the URL locally and reports a shortening-service structural signal without opening it.",
+      "purpose": "Demonstrates safe local URL structure analysis."
+    },
+    {
+      "scenario_id": "ip_host_url_structure",
+      "message": "Review https://198.51.100.7/login before continuing.",
+      "expected_risk_levels": ["moderate"],
+      "expected_evidence_categories": ["url"],
+      "expected_signal_ids": ["ip_address_host"],
+      "expected_behavior": "Parses the URL locally and reports a numeric-host structural signal without treating its octets as subdomains.",
+      "purpose": "Regression check for IP-host URL classification."
+    }
+  ]
+}
